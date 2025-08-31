@@ -33,14 +33,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-			'1.11.0'
+            '1.11.1'
 		);
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			'1.11.0',
+            '1.11.1',
 			true
 		);
 		
@@ -49,14 +49,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-			'1.11.0'
+            '1.11.1'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			'1.11.0',
+            '1.11.1',
 			true
 		);
 		
@@ -65,14 +65,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-			'1.11.0'
+            '1.11.1'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-			'1.11.0',
+            '1.11.1',
 			true
 		);
 		
@@ -102,81 +102,112 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\WC_Products_Widget() );
 	}
 
-	/**
-	 * AJAX handler for product filtering
-	 */
-	public function ajax_filter_products() {
-		// Security check: verify the nonce.
-		check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
+    /**
+     * AJAX handler for product filtering
+     */
+    public function ajax_filter_products() {
+        // Security check: verify the nonce.
+        check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
 
-		if ( ! class_exists( 'WooCommerce' ) ) {
-			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
-		}
+        if ( ! class_exists( 'WooCommerce' ) ) {
+            wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
+        }
 
-		// Sanitize input
-		$filters = isset( $_POST['filters'] ) ? $_POST['filters'] : [];
-		$settings = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
-		$widget_id = isset( $_POST['widget_id'] ) ? sanitize_text_field( $_POST['widget_id'] ) : '';
+        // Sanitize input
+        $filters   = isset( $_POST['filters'] ) ? $_POST['filters'] : [];
+        $settings  = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
+        $widget_id = isset( $_POST['widget_id'] ) ? sanitize_text_field( $_POST['widget_id'] ) : '';
 
-		// Build WooCommerce shortcode attributes
-		$shortcode_atts = [
-			'limit' => isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12,
-			'columns' => isset( $settings['columns'] ) ? intval( $settings['columns'] ) : 4,
-			'orderby' => 'menu_order',
-			'order' => 'ASC',
-		];
+        // Build WP_Query arguments to match the widget output structure
+        $products_per_page = isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12;
 
-		// Apply filters
-		if ( ! empty( $filters['category'] ) ) {
-			$shortcode_atts['category'] = sanitize_text_field( $filters['category'] );
-		}
+        $args = [
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'posts_per_page' => $products_per_page,
+            'paged'          => 1,
+            'meta_query'     => WC()->query->get_meta_query(),
+            'tax_query'      => WC()->query->get_tax_query(),
+        ];
 
-		if ( ! empty( $filters['search'] ) ) {
-			// For search, we need to use a different approach
-			$shortcode_atts['ids'] = $this->get_search_product_ids( sanitize_text_field( $filters['search'] ) );
-		}
+        // Category filter
+        if ( ! empty( $filters['category'] ) ) {
+            $args['tax_query'][] = [
+                'taxonomy' => 'product_cat',
+                'field'    => 'slug',
+                'terms'    => sanitize_text_field( $filters['category'] ),
+            ];
+        }
 
-		if ( ! empty( $filters['orderby'] ) ) {
-			$orderby = sanitize_text_field( $filters['orderby'] );
-			switch ( $orderby ) {
-				case 'popularity':
-					$shortcode_atts['orderby'] = 'popularity';
-					break;
-				case 'rating':
-					$shortcode_atts['orderby'] = 'rating';
-					break;
-				case 'date':
-					$shortcode_atts['orderby'] = 'date';
-					$shortcode_atts['order'] = 'DESC';
-					break;
-				case 'price':
-					$shortcode_atts['orderby'] = 'price';
-					$shortcode_atts['order'] = 'ASC';
-					break;
-				case 'price-desc':
-					$shortcode_atts['orderby'] = 'price';
-					$shortcode_atts['order'] = 'DESC';
-					break;
-			}
-		}
+        // Search filter
+        if ( ! empty( $filters['search'] ) ) {
+            $args['s'] = sanitize_text_field( $filters['search'] );
+        }
 
-		// Use WooCommerce shortcode to get products
-		$shortcode = new \WC_Shortcode_Products( $shortcode_atts, 'products' );
-		$html = $shortcode->get_content();
+        // Orderby mapping
+        if ( ! empty( $filters['orderby'] ) ) {
+            $orderby = sanitize_text_field( $filters['orderby'] );
+            switch ( $orderby ) {
+                case 'popularity':
+                    $args['meta_key'] = 'total_sales';
+                    $args['orderby']  = 'meta_value_num';
+                    $args['order']    = 'DESC';
+                    break;
+                case 'rating':
+                    // Approximate rating sorting
+                    $args['meta_key'] = '_wc_average_rating';
+                    $args['orderby']  = 'meta_value_num';
+                    $args['order']    = 'DESC';
+                    break;
+                case 'date':
+                    $args['orderby'] = 'date';
+                    $args['order']   = 'DESC';
+                    break;
+                case 'price':
+                    $args['meta_key'] = '_price';
+                    $args['orderby']  = 'meta_value_num';
+                    $args['order']    = 'ASC';
+                    break;
+                case 'price-desc':
+                    $args['meta_key'] = '_price';
+                    $args['orderby']  = 'meta_value_num';
+                    $args['order']    = 'DESC';
+                    break;
+                default:
+                    // Fallback to menu order / title
+                    $args['orderby'] = 'menu_order title';
+                    $args['order']   = 'ASC';
+                    break;
+            }
+        }
 
-		// Customize the content
-		if ( ! empty( $html ) ) {
-			$html = $this->customize_ajax_content( $html, $settings );
-		}
+        // Query products
+        $products = new \WP_Query( $args );
 
-		$has_more = false; // For now, we'll implement pagination later
+        if ( ! $products->have_posts() ) {
+            wp_send_json_success( [
+                'html'      => '<div class="no-products-message"><p>' . esc_html__( 'No products found matching your criteria.', 'slidefirePro-widgets' ) . '</p></div>',
+                'has_more'  => false,
+                'count'     => 0,
+                'widget_id' => $widget_id,
+            ] );
+        }
 
-		wp_send_json_success( [
-			'html' => $html,
-			'has_more' => $has_more,
-			'total_found' => $query->found_posts
-		] );
-	}
+        // Build consistent product cards markup (same as initial render and load more)
+        $html = $this->build_ajax_product_cards( $products, $settings );
+
+        $has_more = $products->max_num_pages > 1;
+        $count    = $products->found_posts;
+
+        wp_reset_postdata();
+
+        wp_send_json_success( [
+            'html'      => $html,
+            'has_more'  => $has_more,
+            'count'     => $count,
+            'widget_id' => $widget_id,
+        ] );
+    }
 
 	/**
 	 * AJAX handler for load more products
