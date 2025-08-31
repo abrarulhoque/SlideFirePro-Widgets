@@ -33,14 +33,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-            '1.11.1'
+            '1.11.2'
 		);
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.1',
+            '1.11.2',
 			true
 		);
 		
@@ -49,14 +49,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-            '1.11.1'
+            '1.11.2'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.1',
+            '1.11.2',
 			true
 		);
 		
@@ -65,14 +65,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-            '1.11.1'
+            '1.11.2'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.1',
+            '1.11.2',
 			true
 		);
 		
@@ -374,13 +374,22 @@ class SlideFirePro_Widgets {
 					<!-- Quick Add Button Overlay -->
 					<?php if ( ! isset( $settings['show_quick_add_button'] ) || 'yes' === $settings['show_quick_add_button'] ) : ?>
 					<div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-						<button class="quick-add-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground" data-product-id="<?php echo esc_attr( $product->get_id() ); ?>">
+						<?php 
+						$is_variable = $product && method_exists( $product, 'is_type' ) ? $product->is_type( 'variable' ) : false;
+						$button_text = $is_variable ? $product->add_to_cart_text() : ( $settings['quick_add_text'] ?? 'Quick Add' );
+						?>
+						<button 
+							class="quick-add-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground" 
+							data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+							data-product-url="<?php echo esc_url( $product->get_permalink() ); ?>"
+						>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2" aria-hidden="true">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>
 								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
 							</svg>
-							<?php echo esc_html( $settings['quick_add_text'] ?? 'Quick Add' ); ?>
+							<?php echo esc_html( $button_text ); ?>
 						</button>
 					</div>
 					<?php endif; ?>
@@ -483,13 +492,22 @@ class SlideFirePro_Widgets {
 					<!-- Quick Add Overlay -->
 					<?php if ( 'yes' === $settings['show_quick_add_button'] ) : ?>
 					<div class="product-overlay">
-						<button class="quick-add-button" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+						<?php 
+						$is_variable = $product && method_exists( $product, 'is_type' ) ? $product->is_type( 'variable' ) : false;
+						$button_text = $is_variable ? $product->add_to_cart_text() : ( $settings['quick_add_text'] ?? 'Quick Add' );
+						?>
+						<button 
+							class="quick-add-button" 
+							data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
+							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+							data-product-url="<?php echo esc_url( get_permalink() ); ?>"
+						>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>
 								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
 							</svg>
-							<?php echo esc_html( $settings['quick_add_text'] ?? 'Quick Add' ); ?>
+							<?php echo esc_html( $button_text ); ?>
 						</button>
 					</div>
 					<?php endif; ?>
@@ -681,13 +699,22 @@ class SlideFirePro_Widgets {
 					<!-- Quick Add Overlay -->
 					<?php if ( 'yes' === $settings['show_quick_add_button'] ) : ?>
 					<div class="product-overlay">
-						<button class="quick-add-button" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+						<?php 
+						$is_variable = $product && method_exists( $product, 'is_type' ) ? $product->is_type( 'variable' ) : false;
+						$button_text = $is_variable ? $product->add_to_cart_text() : ( $settings['quick_add_text'] ?? 'Quick Add' );
+						?>
+						<button 
+							class="quick-add-button" 
+							data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
+							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+							data-product-url="<?php echo esc_url( get_permalink() ); ?>"
+						>
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>
 								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
 							</svg>
-							<?php echo esc_html( $settings['quick_add_text'] ?? 'Quick Add' ); ?>
+							<?php echo esc_html( $button_text ); ?>
 						</button>
 					</div>
 					<?php endif; ?>

@@ -47,6 +47,14 @@
             
             const button = $(e.currentTarget);
             const productId = button.data('product-id');
+            const productType = button.data('product-type');
+            const productUrl = button.data('product-url');
+
+            // For variable products (need option selection), go to product page
+            if (productType === 'variable' && productUrl) {
+                window.location.href = productUrl;
+                return;
+            }
             
             if (!productId) {
                 console.error('Product ID not found');
