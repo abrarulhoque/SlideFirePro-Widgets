@@ -225,12 +225,12 @@
 
     // Initialize when DOM is ready
     $(document).ready(function() {
-        // Initialize all product filter widgets on the page
+        // Initialize all product filter widgets on the page once
         $('.wc-product-filter-wrapper').each(function() {
+            const $el = $(this);
+            if ($el.data('wcProductFilter')) return; // avoid duplicate binding
             const filterWidget = new WCProductFilter(this);
-            
-            // Store instance on element for external access
-            $(this).data('wcProductFilter', filterWidget);
+            $el.data('wcProductFilter', filterWidget);
         });
     });
 
@@ -238,7 +238,7 @@
     $(window).on('elementor/frontend/init', function() {
         elementorFrontend.hooks.addAction('frontend/element_ready/slidefirePro-wc-product-filter.default', function($scope) {
             const filterElement = $scope.find('.wc-product-filter-wrapper');
-            if (filterElement.length) {
+            if (filterElement.length && !filterElement.data('wcProductFilter')) {
                 const filterWidget = new WCProductFilter(filterElement[0]);
                 filterElement.data('wcProductFilter', filterWidget);
             }

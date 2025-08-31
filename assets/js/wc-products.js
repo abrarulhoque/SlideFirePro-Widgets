@@ -8,6 +8,9 @@
 
     class SlideFireProProductsWidget {
         constructor() {
+            // Prevent double-binding when both DOM ready and Elementor init fire
+            if (window.__SlideFireProProductsBound) return;
+            window.__SlideFireProProductsBound = true;
             this.init();
         }
 
@@ -227,23 +230,27 @@
         }
 
         handleCategoryFilter(e, data) {
-            console.log('Category filter received:', data);
-            
-            // Only respond if this widget is the target or if no specific target
-            const currentWidget = $('.slidefirePro-products-wrapper').closest('.elementor-widget');
-            const targetSelector = data.targetWidget;
-            
+            // Determine the target products wrapper from provided selector
+            let targetSelector = data && data.targetWidget ? data.targetWidget : null;
+            let targetWrapper = null;
             if (targetSelector) {
-                const targetElement = $(targetSelector);
-                if (targetElement.length && !currentWidget.is(targetSelector) && !currentWidget.closest(targetSelector).length) {
-                    return; // This widget is not the target
+                const $target = $(targetSelector);
+                if ($target.length) {
+                    // Find wrapper inside the target widget
+                    const inner = $target.find('.slidefirePro-products-wrapper');
+                    if (inner.length) targetWrapper = inner.first();
                 }
             }
-            
-            this.filterProducts({
-                category: data.categorySlug,
-                widget_id: data.widgetId
-            });
+
+            const payload = {
+                category: data && data.categorySlug ? data.categorySlug : '',
+            };
+
+            if (targetWrapper && targetWrapper.length) {
+                payload.widget_id = targetWrapper.data('widget-id');
+            }
+
+            this.filterProducts(payload);
         }
 
         handleProductFilter(e, data) {
@@ -270,19 +277,39 @@
         }
 
         filterProducts(filters) {
-            const wrapper = $('.slidefirePro-products-wrapper');
-            if (!wrapper.length) return;
-            
-            const widgetId = filters.widget_id || wrapper.data('widget-id');
+            // Resolve target wrapper more precisely
+            let wrapper = null;
+            // Prefer explicit selector if provided
+            if (filters && filters.targetSelector) {
+                const $t = $(filters.targetSelector);
+                const inner = $t.find('.slidefirePro-products-wrapper');
+                if (inner.length) wrapper = inner.first();
+            }
+            // Then try by widget id
+            if (!wrapper) {
+                const wid = (filters && (filters.widget_id || filters.widgetId)) ? (filters.widget_id || filters.widgetId) : null;
+                if (wid) {
+                    const byId = $(`.slidefirePro-products-wrapper[data-widget-id="${wid}"]`);
+                    if (byId.length) wrapper = byId.first();
+                }
+            }
+            // Fallback to first wrapper on page
+            if (!wrapper) {
+                const all = $('.slidefirePro-products-wrapper');
+                if (!all.length) return;
+                wrapper = all.first();
+            }
+
+            const widgetId = wrapper.data('widget-id');
             const settings = wrapper.data('settings');
-            
-            // Add loading state
+
+            // Add loading state on wrapper only (avoid grid fade-out to prevent double blink)
             wrapper.addClass('loading');
-            
+
             // Reset load more button
             const loadMoreButton = wrapper.find('.load-more-button');
             loadMoreButton.data('page', 1).show();
-            
+
             $.ajax({
                 url: slideFireProAjax.ajax_url,
                 type: 'POST',
@@ -294,26 +321,23 @@
                     nonce: slideFireProAjax.nonce
                 },
                 success: (response) => {
+                    const grid = wrapper.find('.slidefirePro-products-grid');
                     if (response.success && response.data.html) {
-                        // Replace products grid content with fade animation
-                        const grid = wrapper.find('.slidefirePro-products-grid');
-                        grid.fadeOut(200, function() {
-                            grid.html(response.data.html).fadeIn(300);
-                        });
-                        
+                        // Replace products grid content without fade-out to avoid double blink
+                        grid.html(response.data.html);
+
                         // Update load more button state
                         if (response.data.has_more) {
                             loadMoreButton.show();
                         } else {
                             loadMoreButton.hide();
                         }
-                        
+
                         // Scroll to products if not already visible
                         this.scrollToProducts(wrapper);
-                        
+
                     } else if (response.success && response.data.html === '') {
                         // No products found - using grid structure
-                        const grid = wrapper.find('.slidefirePro-products-grid');
                         grid.html('<div class="no-products-message"><p>No products found matching your criteria.</p></div>');
                         loadMoreButton.hide();
                     } else {

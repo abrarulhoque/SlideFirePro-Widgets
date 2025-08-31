@@ -76,7 +76,7 @@
             const categoryTitle = clickedCard.find('h3').text();
             const targetWidget = this.element.data('target-widget');
 
-            // Trigger custom event for product filtering - following Elementor Pro pattern
+            // Trigger custom event for product filtering - grid listens and will update
             $(document).trigger('slideFirePro:categoryChanged', {
                 categorySlug: categorySlug,
                 categoryTitle: categoryTitle,
@@ -85,13 +85,14 @@
                 clickedCard: clickedCard
             });
 
-            // Directly update products widget if target is specified
+            // If no target widget or no products grid present, fallback to direct update
             if (targetWidget) {
-                this.updateTargetProductsWidget(targetWidget, categorySlug);
+                const $targetElement = $(targetWidget);
+                const hasGrid = $targetElement.find('.slidefirePro-products-wrapper').length > 0;
+                if (!hasGrid) {
+                    this.updateTargetProductsWidget(targetWidget, categorySlug);
+                }
             }
-
-            // Send AJAX request for future product widget integration
-            this.sendFilterRequest(categorySlug);
 
             // Announce to screen readers
             this.announceToScreenReader(`Filtered by ${categoryTitle}`);
@@ -115,16 +116,8 @@
                     nonce: slideFireProAjax.nonce
                 },
                 success: (response) => {
-                    if (response.success) {
-                        console.log('Filter applied successfully:', response.data);
-                        
-                        // Trigger event for product widgets to listen to
-                        $(document).trigger('slideFirePro:productsFiltered', {
-                            categorySlug: categorySlug,
-                            widgetId: this.widgetId,
-                            response: response.data
-                        });
-                    } else {
+                    // This path is kept for backward compatibility; grid updates via categoryChanged
+                    if (!response.success) {
                         console.error('Filter request failed:', response.data);
                     }
                 },
