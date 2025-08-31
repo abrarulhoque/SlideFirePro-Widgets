@@ -52,8 +52,17 @@
 
             // Add loading state
             button.addClass('loading').prop('disabled', true);
-            const originalText = button.html();
-            button.html('<svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Adding...');
+            const originalHtml = button.html();
+            
+            // Create loading spinner with icon structure matching Figma
+            const loadingHtml = `
+                <svg class="cart-icon animate-spin" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" opacity="0.25"></circle>
+                    <path d="M4,12a8,8 0 1,1 8,-8V0C5.373,0 0,5.373 0,12h4zm2,5.291A7.962,7.962 0 0,1 4,12H0c0,3.042 1.135,5.824 3,7.938l3,-2.647z" opacity="0.75"></path>
+                </svg>
+                Adding...
+            `;
+            button.html(loadingHtml);
 
             // AJAX call to add product to cart
             $.ajax({
@@ -72,19 +81,27 @@
                         // Trigger WooCommerce cart update event
                         $(document.body).trigger('added_to_cart', [response.data.fragments, response.data.cart_hash, button]);
                         
-                        // Update button text temporarily
-                        button.html('✓ Added!');
+                        // Update button with success state
+                        const successHtml = `
+                            <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 12 2 2 4-4"></path>
+                                <path d="M21 12c.552 0 1-.448 1-1V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v6c0 .552.448 1 1 1"></path>
+                            </svg>
+                            Added!
+                        `;
+                        button.html(successHtml);
+                        
                         setTimeout(() => {
-                            button.html(originalText);
+                            button.html(originalHtml);
                         }, 2000);
                     } else {
                         this.showNotification(response.data.message || 'Failed to add product to cart', 'error');
-                        button.html(originalText);
+                        button.html(originalHtml);
                     }
                 },
                 error: () => {
                     this.showNotification('Error adding product to cart', 'error');
-                    button.html(originalText);
+                    button.html(originalHtml);
                 },
                 complete: () => {
                     button.removeClass('loading').prop('disabled', false);
@@ -99,14 +116,24 @@
             const button = $(e.currentTarget);
             const productId = button.closest('.product-card').data('product-id');
             
-            // Toggle wishlist state
+            // Toggle wishlist state with visual feedback
             button.toggleClass('active');
             
             if (button.hasClass('active')) {
-                button.find('svg').addClass('fill-current');
+                // Fill the heart icon
+                button.find('.heart-icon').attr('fill', 'currentColor');
+                button.addClass('text-red-500');
                 this.showNotification('Added to wishlist!', 'success');
+                
+                // Add subtle animation
+                button.addClass('animate-pulse');
+                setTimeout(() => {
+                    button.removeClass('animate-pulse');
+                }, 500);
             } else {
-                button.find('svg').removeClass('fill-current');
+                // Unfill the heart icon
+                button.find('.heart-icon').attr('fill', 'none');
+                button.removeClass('text-red-500');
                 this.showNotification('Removed from wishlist!', 'info');
             }
             
@@ -175,13 +202,13 @@
         }
 
         handleProductClick(e) {
-            // Don't navigate if clicking on buttons
-            if ($(e.target).closest('.quick-add-button, .wishlist-button').length) {
+            // Don't navigate if clicking on buttons or overlay
+            if ($(e.target).closest('.quick-add-button, .wishlist-button, .product-overlay').length) {
                 return;
             }
             
             const card = $(e.currentTarget);
-            const productLink = card.find('.product-title a').attr('href');
+            const productLink = card.find('.product-title a, .product-link').first().attr('href');
             
             if (productLink) {
                 window.location.href = productLink;
@@ -225,7 +252,7 @@
                 },
                 success: (response) => {
                     if (response.success && response.data.html) {
-                        // Replace products grid content
+                        // Replace products grid content with fade animation
                         const grid = wrapper.find('.slidefirePro-products-grid');
                         grid.fadeOut(200, function() {
                             grid.html(response.data.html).fadeIn(300);
@@ -242,9 +269,9 @@
                         this.scrollToProducts(wrapper);
                         
                     } else if (response.success && response.data.html === '') {
-                        // No products found
+                        // No products found - using grid structure
                         const grid = wrapper.find('.slidefirePro-products-grid');
-                        grid.html('<div class="col-span-full text-center py-12"><p class="text-muted-foreground text-lg">No products found matching your criteria.</p></div>');
+                        grid.html('<div class="no-products-message"><p>No products found matching your criteria.</p></div>');
                         loadMoreButton.hide();
                     } else {
                         this.showNotification('Error filtering products', 'error');
