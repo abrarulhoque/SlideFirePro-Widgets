@@ -33,48 +33,48 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-            '1.11.4'
-		);
+            '1.11.5'
+        );
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.4',
-			true
-		);
+            '1.11.5',
+            true
+        );
 		
 		// Register WC product filter assets
 		wp_register_style(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-            '1.11.4'
-		);
+            '1.11.5'
+        );
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.4',
-			true
-		);
+            '1.11.5',
+            true
+        );
 		
 		// Register WC products assets
 		wp_register_style(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-            '1.11.4'
-		);
+            '1.11.5'
+        );
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.11.4',
-			true
-		);
+            '1.11.5',
+            true
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -130,13 +130,29 @@ class SlideFirePro_Widgets {
             'tax_query'      => WC()->query->get_tax_query(),
         ];
 
-        // Category filter
-        if ( ! empty( $filters['category'] ) ) {
-            $args['tax_query'][] = [
-                'taxonomy' => 'product_cat',
-                'field'    => 'slug',
-                'terms'    => sanitize_text_field( $filters['category'] ),
-            ];
+        // Category filter (supports single or multiple)
+        if ( isset( $filters['category'] ) && $filters['category'] !== '' ) {
+            $cat_input = $filters['category'];
+            $terms = [];
+            if ( is_array( $cat_input ) ) {
+                $terms = array_filter( array_map( 'sanitize_title', $cat_input ) );
+            } else {
+                $cat_input = (string) $cat_input;
+                if ( strpos( $cat_input, ',' ) !== false ) {
+                    $parts = array_map( 'trim', explode( ',', $cat_input ) );
+                    $terms = array_filter( array_map( 'sanitize_title', $parts ) );
+                } elseif ( $cat_input !== '' ) {
+                    $terms = [ sanitize_title( $cat_input ) ];
+                }
+            }
+            if ( ! empty( $terms ) ) {
+                $args['tax_query'][] = [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'slug',
+                    'terms'    => $terms,
+                    'operator' => 'IN',
+                ];
+            }
         }
 
         // Search filter
@@ -236,14 +252,30 @@ class SlideFirePro_Widgets {
 			'tax_query' => WC()->query->get_tax_query(),
 		];
 
-		// Add category filter if set
-		if ( ! empty( $filters['category'] ) ) {
-			$args['tax_query'][] = [
-				'taxonomy' => 'product_cat',
-				'field'    => 'slug',
-				'terms'    => sanitize_text_field( $filters['category'] ),
-			];
-		}
+        // Add category filter if set (supports multiple)
+        if ( isset( $filters['category'] ) && $filters['category'] !== '' ) {
+            $cat_input = $filters['category'];
+            $terms = [];
+            if ( is_array( $cat_input ) ) {
+                $terms = array_filter( array_map( 'sanitize_title', $cat_input ) );
+            } else {
+                $cat_input = (string) $cat_input;
+                if ( strpos( $cat_input, ',' ) !== false ) {
+                    $parts = array_map( 'trim', explode( ',', $cat_input ) );
+                    $terms = array_filter( array_map( 'sanitize_title', $parts ) );
+                } elseif ( $cat_input !== '' ) {
+                    $terms = [ sanitize_title( $cat_input ) ];
+                }
+            }
+            if ( ! empty( $terms ) ) {
+                $args['tax_query'][] = [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'slug',
+                    'terms'    => $terms,
+                    'operator' => 'IN',
+                ];
+            }
+        }
 
 		$products = new \WP_Query( $args );
 
@@ -608,9 +640,23 @@ class SlideFirePro_Widgets {
 			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
 		}
 
-		// Sanitize input
-		$category_slug = sanitize_text_field( $_POST['category_slug'] ?? '' );
-		$target_widget = sanitize_text_field( $_POST['target_widget'] ?? '' );
+        // Sanitize input (supports multiple slugs)
+        $target_widget = sanitize_text_field( $_POST['target_widget'] ?? '' );
+        $category_slugs = $_POST['category_slugs'] ?? null;
+        $terms = [];
+        if ( is_array( $category_slugs ) ) {
+            $terms = array_filter( array_map( 'sanitize_title', $category_slugs ) );
+        } else {
+            $category_slug = sanitize_text_field( $_POST['category_slug'] ?? '' );
+            if ( $category_slug !== '' ) {
+                if ( strpos( $category_slug, ',' ) !== false ) {
+                    $parts = array_map( 'trim', explode( ',', $category_slug ) );
+                    $terms = array_filter( array_map( 'sanitize_title', $parts ) );
+                } else {
+                    $terms = [ sanitize_title( $category_slug ) ];
+                }
+            }
+        }
 
 		// Build WP_Query arguments for products
 		$args = [
@@ -621,14 +667,15 @@ class SlideFirePro_Widgets {
 			'tax_query' => WC()->query->get_tax_query(),
 		];
 
-		// Add category filter if not empty (empty means "All")
-		if ( ! empty( $category_slug ) ) {
-			$args['tax_query'][] = [
-				'taxonomy' => 'product_cat',
-				'field'    => 'slug',
-				'terms'    => $category_slug,
-			];
-		}
+        // Add category filter if provided (empty means "All")
+        if ( ! empty( $terms ) ) {
+            $args['tax_query'][] = [
+                'taxonomy' => 'product_cat',
+                'field'    => 'slug',
+                'terms'    => $terms,
+                'operator' => 'IN',
+            ];
+        }
 
 		$products = new \WP_Query( $args );
 
@@ -648,9 +695,9 @@ class SlideFirePro_Widgets {
 		wp_send_json_success( [
 			'html' => $html,
 			'count' => $products->found_posts,
-			'category' => $category_slug,
-			'target_widget' => $target_widget
-		] );
+            'category' => $terms,
+            'target_widget' => $target_widget
+        ] );
 	}
 
 	/**

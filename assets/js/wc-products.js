@@ -242,8 +242,23 @@
                 }
             }
 
+            // Normalize categories (support multiple)
+            let category = '';
+            if (data) {
+                if (Array.isArray(data.categorySlugs)) {
+                    category = data.categorySlugs;
+                } else if (data.categorySlug) {
+                    // Allow comma-separated string
+                    if (typeof data.categorySlug === 'string' && data.categorySlug.includes(',')) {
+                        category = data.categorySlug.split(',').map(s => s.trim()).filter(Boolean);
+                    } else {
+                        category = data.categorySlug;
+                    }
+                }
+            }
+
             const payload = {
-                category: data && data.categorySlug ? data.categorySlug : '',
+                category
             };
 
             if (targetWrapper && targetWrapper.length) {
@@ -359,7 +374,12 @@
             // Get category filter from category widget
             const activeCategoryButton = $('.category-filter-card.active, .category-filter-card[aria-pressed="true"]');
             if (activeCategoryButton.length) {
-                filters.category = activeCategoryButton.data('category') || '';
+                const raw = (activeCategoryButton.attr('data-categories') || activeCategoryButton.data('category') || '').toString();
+                if (raw.includes(',')) {
+                    filters.category = raw.split(',').map(s => s.trim()).filter(Boolean);
+                } else {
+                    filters.category = raw || '';
+                }
             }
             
             // Get filters from product filter widget

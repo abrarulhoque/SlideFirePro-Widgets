@@ -102,16 +102,18 @@ class Category_Filter_Widget extends Widget_Base {
 			}
 		}
 
-		$repeater->add_control(
-			'category_slug',
-			[
-				'label' => esc_html__( 'WooCommerce Category', 'slidefirePro-widgets' ),
-				'type' => Controls_Manager::SELECT,
-				'options' => $product_categories,
-				'default' => '',
-				'description' => esc_html__( 'Select a WooCommerce category to filter products, or leave empty for "All Products"', 'slidefirePro-widgets' ),
-			]
-		);
+        $repeater->add_control(
+            'category_slug',
+            [
+                'label' => esc_html__( 'WooCommerce Categories', 'slidefirePro-widgets' ),
+                'type' => Controls_Manager::SELECT2,
+                'options' => $product_categories,
+                'multiple' => true,
+                'label_block' => true,
+                'default' => [],
+                'description' => esc_html__( 'Select one or more WooCommerce categories to filter products. Leave empty for "All Products"', 'slidefirePro-widgets' ),
+            ]
+        );
 
 		$repeater->add_control(
 			'icon_color',
@@ -145,66 +147,66 @@ class Category_Filter_Widget extends Widget_Base {
 				'type' => Controls_Manager::REPEATER,
 				'fields' => $repeater->get_controls(),
 				'default' => [
-					[
-						'category_title' => esc_html__( 'All', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-grid-alt',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => '',
-						'icon_color' => 'primary',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grid3x3 w-8 h-8" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>',
-					],
-					[
-						'category_title' => esc_html__( 'Jerseys', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-tshirt',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => 'jerseys',
-						'icon_color' => 'primary',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt w-8 h-8" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
-					],
-					[
-						'category_title' => esc_html__( 'Pants', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-box',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => 'pants',
-						'icon_color' => 'blue',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-8 h-8" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><path d="m7.5 4.27 9 5.15"></path></svg>',
-					],
-					[
-						'category_title' => esc_html__( 'Headbands', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-headphones',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => 'headbands',
-						'icon_color' => 'purple',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones w-8 h-8" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg>',
-					],
-					[
-						'category_title' => esc_html__( 'Hoodies', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-tshirt',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => 'hoodies',
-						'icon_color' => 'orange',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt w-8 h-8" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
-					],
-					[
-						'category_title' => esc_html__( 'Team Apparel', 'slidefirePro-widgets' ),
-						'category_icon' => [
-							'value' => 'fas fa-users',
-							'library' => 'fa-solid',
-						],
-						'category_slug' => 'team-apparel',
-						'icon_color' => 'blue',
-						'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-8 h-8" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>',
-					],
+                    [
+                        'category_title' => esc_html__( 'All', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-grid-alt',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => [],
+                        'icon_color' => 'primary',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grid3x3 w-8 h-8" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>',
+                    ],
+                    [
+                        'category_title' => esc_html__( 'Jerseys', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-tshirt',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => ['jerseys'],
+                        'icon_color' => 'primary',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt w-8 h-8" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
+                    ],
+                    [
+                        'category_title' => esc_html__( 'Pants', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-box',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => ['pants'],
+                        'icon_color' => 'blue',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-8 h-8" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><path d="m7.5 4.27 9 5.15"></path></svg>',
+                    ],
+                    [
+                        'category_title' => esc_html__( 'Headbands', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-headphones',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => ['headbands'],
+                        'icon_color' => 'purple',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones w-8 h-8" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path></svg>',
+                    ],
+                    [
+                        'category_title' => esc_html__( 'Hoodies', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-tshirt',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => ['hoodies'],
+                        'icon_color' => 'orange',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shirt w-8 h-8" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
+                    ],
+                    [
+                        'category_title' => esc_html__( 'Team Apparel', 'slidefirePro-widgets' ),
+                        'category_icon' => [
+                            'value' => 'fas fa-users',
+                            'library' => 'fa-solid',
+                        ],
+                        'category_slug' => ['team-apparel'],
+                        'icon_color' => 'blue',
+                        'icon_svg' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-8 h-8" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>',
+                    ],
 				],
 				'title_field' => '{{{ category_title }}}',
 			]
@@ -338,14 +340,24 @@ class Category_Filter_Widget extends Widget_Base {
 					$is_first = ( $index === 0 );
 					$active_classes = $is_first ? 'border-primary ring-2 ring-primary/20' : 'border-border';
 				?>
-					<div data-slot="card" 
-						 class="category-filter-card text-card-foreground flex flex-col gap-6 rounded-xl border bg-card hover:border-primary/50 transition-all duration-300 cursor-pointer group <?php echo esc_attr( $active_classes ); ?>" 
-						 data-category="<?php echo esc_attr( $item['category_slug'] ); ?>"
-						 data-filter="<?php echo esc_attr( $item['category_slug'] ); ?>"
-						 role="button" 
-						 tabindex="0"
-						 aria-pressed="<?php echo $is_first ? 'true' : 'false'; ?>"
-						 aria-label="<?php echo esc_attr( sprintf( __( 'Filter by %s', 'slidefirePro-widgets' ), $item['category_title'] ) ); ?>">
+                    <div data-slot="card" 
+                         class="category-filter-card text-card-foreground flex flex-col gap-6 rounded-xl border bg-card hover:border-primary/50 transition-all duration-300 cursor-pointer group <?php echo esc_attr( $active_classes ); ?>" 
+                         <?php 
+                            // Back-compat: control used to be single-select string; now may be array
+                            $cat_value = isset($item['category_slug']) ? $item['category_slug'] : '';
+                            if (is_array($cat_value)) {
+                                $cat_join = implode(',', array_filter(array_map('sanitize_title', $cat_value)));
+                            } else {
+                                $cat_join = sanitize_text_field($cat_value);
+                            }
+                         ?>
+                         data-category="<?php echo esc_attr( $cat_join ); ?>"
+                         data-categories="<?php echo esc_attr( $cat_join ); ?>"
+                         data-filter="<?php echo esc_attr( $cat_join ); ?>"
+                         role="button" 
+                         tabindex="0"
+                         aria-pressed="<?php echo $is_first ? 'true' : 'false'; ?>"
+                         aria-label="<?php echo esc_attr( sprintf( __( 'Filter by %s', 'slidefirePro-widgets' ), $item['category_title'] ) ); ?>">
 						
 						<div class="p-6 text-center">
 							<div class="mb-4 flex justify-center">

@@ -71,14 +71,19 @@
             // Set active state
             this.setCardActive(clickedCard);
 
-            // Get category slug
-            const categorySlug = clickedCard.data('category') || '';
+            // Get category slugs (supports multiple)
+            const rawCats = (clickedCard.attr('data-categories') || clickedCard.data('category') || '').toString();
+            const categorySlugs = rawCats
+                ? rawCats.split(',').map(s => s.trim()).filter(Boolean)
+                : [];
+            const categorySlug = categorySlugs.length > 0 ? categorySlugs[0] : '';
             const categoryTitle = clickedCard.find('h3').text();
             const targetWidget = this.element.data('target-widget');
 
             // Trigger custom event for product filtering - grid listens and will update
             $(document).trigger('slideFirePro:categoryChanged', {
-                categorySlug: categorySlug,
+                categorySlug: categorySlug, // back-compat
+                categorySlugs: categorySlugs,
                 categoryTitle: categoryTitle,
                 widgetId: this.widgetId,
                 targetWidget: targetWidget,
@@ -90,7 +95,7 @@
                 const $targetElement = $(targetWidget);
                 const hasGrid = $targetElement.find('.slidefirePro-products-wrapper').length > 0;
                 if (!hasGrid) {
-                    this.updateTargetProductsWidget(targetWidget, categorySlug);
+                    this.updateTargetProductsWidget(targetWidget, categorySlugs);
                 }
             }
 
@@ -216,7 +221,7 @@
         }
 
         // Update target products widget - following Elementor Pro pattern
-        updateTargetProductsWidget(targetWidget, categorySlug) {
+        updateTargetProductsWidget(targetWidget, categorySlugs) {
             if (!targetWidget) return;
 
             const $targetElement = $(targetWidget);
@@ -242,7 +247,7 @@
                 type: 'POST',
                 data: {
                     action: 'slidefirePro_filter_products_by_category',
-                    category_slug: categorySlug,
+                    category_slugs: categorySlugs,
                     target_widget: targetWidget,
                     nonce: slideFireProAjax.nonce
                 },
@@ -253,7 +258,7 @@
                         
                         // Trigger refresh event for any dependent widgets
                         $(document).trigger('slideFirePro:productsUpdated', {
-                            categorySlug: categorySlug,
+                            categorySlugs: categorySlugs,
                             targetWidget: targetWidget,
                             productsCount: response.data.count || 0
                         });
