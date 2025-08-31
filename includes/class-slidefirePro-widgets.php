@@ -22,7 +22,7 @@ class SlideFirePro_Widgets {
 	 * Register widget assets (styles and scripts)
 	 */
 	public function register_widget_assets() {
-		// Register widget styles
+		// Register category filter assets
 		wp_register_style(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
@@ -30,7 +30,6 @@ class SlideFirePro_Widgets {
 			SLIDEFIREPRO_WIDGETS_VERSION
 		);
 		
-		// Register widget scripts
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
@@ -39,8 +38,29 @@ class SlideFirePro_Widgets {
 			true
 		);
 		
+		// Register WC product filter assets
+		wp_register_style(
+			'slidefirePro-wc-product-filter',
+			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
+			[],
+			SLIDEFIREPRO_WIDGETS_VERSION
+		);
+		
+		wp_register_script(
+			'slidefirePro-wc-product-filter',
+			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
+			[ 'jquery', 'elementor-frontend' ],
+			SLIDEFIREPRO_WIDGETS_VERSION,
+			true
+		);
+		
 		// Localize script for AJAX
 		wp_localize_script( 'slidefirePro-category-filter', 'slideFireProAjax', [
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'slidefirePro_filter_nonce' )
+		]);
+		
+		wp_localize_script( 'slidefirePro-wc-product-filter', 'slideFireProAjax', [
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'slidefirePro_filter_nonce' )
 		]);
@@ -52,9 +72,11 @@ class SlideFirePro_Widgets {
 	public function register_widgets( $widgets_manager ) {
 		// Include the widget class files.
 		require_once( __DIR__. '/widgets/class-category-filter-widget.php' );
+		require_once( __DIR__. '/widgets/class-wc-product-filter-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
+		$widgets_manager->register( new Widgets\WC_Product_Filter_Widget() );
 	}
 
 	/**
