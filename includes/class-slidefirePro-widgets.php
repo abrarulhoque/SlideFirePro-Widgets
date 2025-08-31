@@ -16,6 +16,8 @@ class SlideFirePro_Widgets {
 		// Register AJAX handlers
 		add_action( 'wp_ajax_slidefirePro_filter_products', [ $this, 'ajax_filter_products' ] );
 		add_action( 'wp_ajax_nopriv_slidefirePro_filter_products', [ $this, 'ajax_filter_products' ] );
+		add_action( 'wp_ajax_slidefirePro_filter_products_by_category', [ $this, 'ajax_filter_products_by_category' ] );
+		add_action( 'wp_ajax_nopriv_slidefirePro_filter_products_by_category', [ $this, 'ajax_filter_products_by_category' ] );
 		add_action( 'wp_ajax_slidefirePro_load_more_products', [ $this, 'ajax_load_more_products' ] );
 		add_action( 'wp_ajax_nopriv_slidefirePro_load_more_products', [ $this, 'ajax_load_more_products' ] );
 		add_action( 'wp_ajax_slidefirePro_add_to_cart', [ $this, 'ajax_add_to_cart' ] );
@@ -31,14 +33,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-			SLIDEFIREPRO_WIDGETS_VERSION
+			'1.11.0'
 		);
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			SLIDEFIREPRO_WIDGETS_VERSION,
+			'1.11.0',
 			true
 		);
 		
@@ -47,14 +49,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-			SLIDEFIREPRO_WIDGETS_VERSION
+			'1.11.0'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			SLIDEFIREPRO_WIDGETS_VERSION,
+			'1.11.0',
 			true
 		);
 		
@@ -63,14 +65,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-			SLIDEFIREPRO_WIDGETS_VERSION
+			'1.11.0'
 		);
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-			SLIDEFIREPRO_WIDGETS_VERSION,
+			'1.11.0',
 			true
 		);
 		
@@ -544,6 +546,161 @@ class SlideFirePro_Widgets {
 		);
 
 		return $content;
+	}
+
+	/**
+	 * AJAX handler specifically for category filtering - following Elementor Pro pattern
+	 */
+	public function ajax_filter_products_by_category() {
+		// Security check: verify the nonce.
+		check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
+		}
+
+		// Sanitize input
+		$category_slug = sanitize_text_field( $_POST['category_slug'] ?? '' );
+		$target_widget = sanitize_text_field( $_POST['target_widget'] ?? '' );
+
+		// Build WP_Query arguments for products
+		$args = [
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			'posts_per_page' => 12, // Default products per page
+			'meta_query' => WC()->query->get_meta_query(),
+			'tax_query' => WC()->query->get_tax_query(),
+		];
+
+		// Add category filter if not empty (empty means "All")
+		if ( ! empty( $category_slug ) ) {
+			$args['tax_query'][] = [
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => $category_slug,
+			];
+		}
+
+		$products = new \WP_Query( $args );
+
+		if ( ! $products->have_posts() ) {
+			wp_send_json_success( [
+				'html' => '',
+				'count' => 0,
+				'message' => 'No products found for this category.'
+			] );
+		}
+
+		// Generate HTML using the same structure as the main products widget
+		$html = $this->build_category_filtered_products( $products );
+
+		wp_reset_postdata();
+
+		wp_send_json_success( [
+			'html' => $html,
+			'count' => $products->found_posts,
+			'category' => $category_slug,
+			'target_widget' => $target_widget
+		] );
+	}
+
+	/**
+	 * Build filtered products HTML for category filtering
+	 */
+	private function build_category_filtered_products( $products ) {
+		$settings = [
+			'show_sale_badge' => 'yes',
+			'show_featured_badge' => 'yes',
+			'show_category_badge' => 'yes',
+			'show_wishlist_button' => 'yes',
+			'show_quick_add_button' => 'yes',
+			'quick_add_text' => 'Quick Add'
+		];
+
+		ob_start();
+		
+		while ( $products->have_posts() ) :
+			$products->the_post();
+			global $product;
+			?>
+			<div data-slot="card" class="product-card text-card-foreground group cursor-pointer" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+				<div class="product-image-wrapper">
+					<a href="<?php echo esc_url( get_permalink() ); ?>" class="product-link">
+						<?php echo woocommerce_get_product_thumbnail( 'woocommerce_thumbnail', [ 'class' => 'product-image' ] ); ?>
+					</a>
+					
+					<!-- Product Badges -->
+					<?php if ( $product->is_on_sale() && 'yes' === $settings['show_sale_badge'] ) : ?>
+					<span class="product-badge sale-badge">BESTSELLER</span>
+					<?php endif; ?>
+					
+					<?php if ( $product->is_featured() && 'yes' === $settings['show_featured_badge'] ) : ?>
+					<span class="product-badge featured-badge">FEATURED</span>
+					<?php endif; ?>
+					
+					<!-- Wishlist Button -->
+					<?php if ( 'yes' === $settings['show_wishlist_button'] ) : ?>
+					<button class="wishlist-button" aria-label="<?php esc_attr_e( 'Add to wishlist', 'slidefirePro-widgets' ); ?>">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon">
+							<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
+						</svg>
+					</button>
+					<?php endif; ?>
+					
+					<!-- Quick Add Overlay -->
+					<?php if ( 'yes' === $settings['show_quick_add_button'] ) : ?>
+					<div class="product-overlay">
+						<button class="quick-add-button" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
+								<circle cx="8" cy="21" r="1"></circle>
+								<circle cx="19" cy="21" r="1"></circle>
+								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+							</svg>
+							<?php echo esc_html( $settings['quick_add_text'] ?? 'Quick Add' ); ?>
+						</button>
+					</div>
+					<?php endif; ?>
+				</div>
+				
+				<div class="product-content">
+					<?php if ( 'yes' === $settings['show_category_badge'] ) : ?>
+					<div class="product-category-wrapper">
+						<?php
+						$categories = wp_get_post_terms( $product->get_id(), 'product_cat' );
+						if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+							$category = $categories[0];
+							echo '<span class="category-badge">' . esc_html( $category->name ) . '</span>';
+						}
+						?>
+					</div>
+					<?php endif; ?>
+					
+					<h3 class="product-title">
+						<a href="<?php echo esc_url( get_permalink() ); ?>">
+							<?php echo esc_html( get_the_title() ); ?>
+						</a>
+					</h3>
+					
+					<div class="product-price-wrapper">
+						<?php echo $product->get_price_html(); ?>
+						<?php if ( $product->is_on_sale() && 'yes' === $settings['show_sale_badge'] ) : ?>
+							<?php
+							$regular_price = floatval( $product->get_regular_price() );
+							$sale_price = floatval( $product->get_sale_price() );
+							
+							if ( $regular_price > 0 && $sale_price > 0 ) {
+								$percentage = round( ( ( $regular_price - $sale_price ) / $regular_price ) * 100 );
+								echo '<span class="sale-percentage-badge">' . esc_html( $percentage . '% OFF' ) . '</span>';
+							}
+							?>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+			<?php
+		endwhile;
+		
+		return ob_get_clean();
 	}
 }
 

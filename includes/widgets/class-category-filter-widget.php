@@ -50,6 +50,17 @@ class Category_Filter_Widget extends Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'target_widget_id',
+			[
+				'label' => esc_html__( 'Target Products Widget', 'slidefirePro-widgets' ),
+				'type' => Controls_Manager::TEXT,
+				'description' => esc_html__( 'Enter the CSS selector or ID of the products widget to filter (e.g., .elementor-element-12345 or #products-widget)', 'slidefirePro-widgets' ),
+				'placeholder' => esc_html__( '.elementor-element-12345', 'slidefirePro-widgets' ),
+				'frontend_available' => true,
+			]
+		);
+
 		$repeater = new Repeater();
 
 		$repeater->add_control(
@@ -321,17 +332,19 @@ class Category_Filter_Widget extends Widget_Base {
 		$widget_id = $this->get_id();
 		?>
 
-		<div class="mb-16" data-widget-id="<?php echo esc_attr( $widget_id ); ?>">
-			<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+		<div class="slidefirePro-category-filter mb-16" data-widget-id="<?php echo esc_attr( $widget_id ); ?>" data-target-widget="<?php echo esc_attr( $settings['target_widget_id'] ?? '' ); ?>">
+			<div class="slidefirePro-category-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
 				<?php foreach ( $settings['categories'] as $index => $item ) : 
 					$is_first = ( $index === 0 );
 					$active_classes = $is_first ? 'border-primary ring-2 ring-primary/20' : 'border-border';
 				?>
 					<div data-slot="card" 
-						 class="text-card-foreground flex flex-col gap-6 rounded-xl border bg-card hover:border-primary/50 transition-all duration-300 cursor-pointer group <?php echo esc_attr( $active_classes ); ?>" 
+						 class="category-filter-card text-card-foreground flex flex-col gap-6 rounded-xl border bg-card hover:border-primary/50 transition-all duration-300 cursor-pointer group <?php echo esc_attr( $active_classes ); ?>" 
 						 data-category="<?php echo esc_attr( $item['category_slug'] ); ?>"
+						 data-filter="<?php echo esc_attr( $item['category_slug'] ); ?>"
 						 role="button" 
 						 tabindex="0"
+						 aria-pressed="<?php echo $is_first ? 'true' : 'false'; ?>"
 						 aria-label="<?php echo esc_attr( sprintf( __( 'Filter by %s', 'slidefirePro-widgets' ), $item['category_title'] ) ); ?>">
 						
 						<div class="p-6 text-center">

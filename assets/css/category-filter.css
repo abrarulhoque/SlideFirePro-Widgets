@@ -198,6 +198,56 @@
   transition: transform 0.3s ease;
 }
 
+/* Loading states for category filter communication */
+.slidefirePro-category-filter.loading .category-filter-card {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.slidefirePro-category-filter.filtering-products {
+  opacity: 0.8;
+}
+
+/* Target products widget loading state */
+.elementor-widget.filtering-products {
+  position: relative;
+}
+
+.elementor-widget.filtering-products::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elementor-widget.filtering-products::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 11;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 /* Typography */
 .font-semibold {
   font-weight: 600;

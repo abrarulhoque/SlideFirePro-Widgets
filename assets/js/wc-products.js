@@ -31,11 +31,14 @@
         }
 
         setupFilterListeners() {
-            // Listen for category filter changes
-            $(document).on('slideFireProCategoryChanged', this.handleCategoryFilter.bind(this));
+            // Listen for category filter changes - following Elementor Pro pattern
+            $(document).on('slideFirePro:categoryChanged', this.handleCategoryFilter.bind(this));
             
             // Listen for product filter changes (search, sort, etc.)
-            $(document).on('slideFireProProductFilterChanged', this.handleProductFilter.bind(this));
+            $(document).on('slideFirePro:productFilterChanged', this.handleProductFilter.bind(this));
+            
+            // Listen for products updated events
+            $(document).on('slideFirePro:productsUpdated', this.handleProductsUpdated.bind(this));
         }
 
         handleQuickAdd(e) {
@@ -216,14 +219,41 @@
         }
 
         handleCategoryFilter(e, data) {
+            console.log('Category filter received:', data);
+            
+            // Only respond if this widget is the target or if no specific target
+            const currentWidget = $('.slidefirePro-products-wrapper').closest('.elementor-widget');
+            const targetSelector = data.targetWidget;
+            
+            if (targetSelector) {
+                const targetElement = $(targetSelector);
+                if (targetElement.length && !currentWidget.is(targetSelector) && !currentWidget.closest(targetSelector).length) {
+                    return; // This widget is not the target
+                }
+            }
+            
             this.filterProducts({
-                category: data.category,
-                widget_id: data.widget_id
+                category: data.categorySlug,
+                widget_id: data.widgetId
             });
         }
 
         handleProductFilter(e, data) {
             this.filterProducts(data);
+        }
+
+        handleProductsUpdated(e, data) {
+            console.log('Products updated:', data);
+            // Refresh any dependent UI elements if needed
+            this.refreshProductCount(data.productsCount);
+        }
+
+        refreshProductCount(count) {
+            // Update any product count displays if they exist
+            const countElement = $('.slidefirePro-products-count');
+            if (countElement.length && typeof count === 'number') {
+                countElement.text(count + (count === 1 ? ' product' : ' products'));
+            }
         }
 
         filterProducts(filters) {

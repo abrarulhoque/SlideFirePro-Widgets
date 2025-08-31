@@ -74,14 +74,21 @@
             // Get category slug
             const categorySlug = clickedCard.data('category') || '';
             const categoryTitle = clickedCard.find('h3').text();
+            const targetWidget = this.element.data('target-widget');
 
-            // Trigger custom event for product filtering
+            // Trigger custom event for product filtering - following Elementor Pro pattern
             $(document).trigger('slideFirePro:categoryChanged', {
                 categorySlug: categorySlug,
                 categoryTitle: categoryTitle,
                 widgetId: this.widgetId,
+                targetWidget: targetWidget,
                 clickedCard: clickedCard
             });
+
+            // Directly update products widget if target is specified
+            if (targetWidget) {
+                this.updateTargetProductsWidget(targetWidget, categorySlug);
+            }
 
             // Send AJAX request for future product widget integration
             this.sendFilterRequest(categorySlug);
@@ -213,6 +220,64 @@
         getActiveCategory() {
             const activeCard = this.cards.filter('.active');
             return activeCard.length ? activeCard.data('category') : null;
+        }
+
+        // Update target products widget - following Elementor Pro pattern
+        updateTargetProductsWidget(targetWidget, categorySlug) {
+            if (!targetWidget) return;
+
+            const $targetElement = $(targetWidget);
+            if (!$targetElement.length) {
+                console.warn('Target products widget not found:', targetWidget);
+                return;
+            }
+
+            // Find the products grid within the target widget
+            const $productsGrid = $targetElement.find('.slidefirePro-products-grid');
+            if (!$productsGrid.length) {
+                console.warn('Products grid not found in target widget');
+                return;
+            }
+
+            // Add loading state
+            $targetElement.addClass('filtering-products');
+            $productsGrid.css('opacity', '0.5');
+
+            // Make AJAX request to get filtered products
+            $.ajax({
+                url: slideFireProAjax.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'slidefirePro_filter_products_by_category',
+                    category_slug: categorySlug,
+                    target_widget: targetWidget,
+                    nonce: slideFireProAjax.nonce
+                },
+                success: (response) => {
+                    if (response.success && response.data.html) {
+                        // Update products grid with new content
+                        $productsGrid.html(response.data.html);
+                        
+                        // Trigger refresh event for any dependent widgets
+                        $(document).trigger('slideFirePro:productsUpdated', {
+                            categorySlug: categorySlug,
+                            targetWidget: targetWidget,
+                            productsCount: response.data.count || 0
+                        });
+                    } else {
+                        console.error('Failed to filter products:', response.data);
+                        $productsGrid.html('<div class="no-products-message"><p>No products found for this category.</p></div>');
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error('AJAX request failed:', error);
+                    $productsGrid.html('<div class="no-products-message"><p>Error loading products. Please try again.</p></div>');
+                },
+                complete: () => {
+                    $targetElement.removeClass('filtering-products');
+                    $productsGrid.css('opacity', '1');
+                }
+            });
         }
     }
 
