@@ -193,30 +193,41 @@ class SlideFirePro_Widgets {
 		$settings = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
 		$products_per_page = isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12;
 
-		// Build shortcode attributes for load more
-		$shortcode_atts = [
-			'limit' => $products_per_page,
-			'columns' => isset( $settings['columns'] ) ? intval( $settings['columns'] ) : 4,
-			'orderby' => 'menu_order',
-			'order' => 'ASC',
-			'page' => $page, // This might need to be handled differently
+		// Build WP_Query arguments - same as main widget
+		$args = [
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			'posts_per_page' => $products_per_page,
+			'paged' => $page,
+			'meta_query' => WC()->query->get_meta_query(),
+			'tax_query' => WC()->query->get_tax_query(),
 		];
 
-		// Apply same filters as main query
+		// Add category filter if set
 		if ( ! empty( $filters['category'] ) ) {
-			$shortcode_atts['category'] = sanitize_text_field( $filters['category'] );
+			$args['tax_query'][] = [
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => sanitize_text_field( $filters['category'] ),
+			];
 		}
 
-		// Use WooCommerce shortcode
-		$shortcode = new \WC_Shortcode_Products( $shortcode_atts, 'products' );
-		$html = $shortcode->get_content();
+		$products = new \WP_Query( $args );
 
-		// Customize the content
-		if ( ! empty( $html ) ) {
-			$html = $this->customize_ajax_content( $html, $settings );
+		if ( ! $products->have_posts() ) {
+			wp_send_json_success( [
+				'html' => '',
+				'has_more' => false
+			] );
 		}
 
-		$has_more = false; // For now, simplified
+		// Generate custom HTML using same structure as widget
+		$html = $this->build_ajax_product_cards( $products, $settings );
+
+		// Check if there are more pages
+		$has_more = $products->max_num_pages > $page;
+
+		wp_reset_postdata();
 
 		wp_send_json_success( [
 			'html' => $html,
@@ -408,6 +419,113 @@ class SlideFirePro_Widgets {
 	/**
 	 * Customize AJAX content with our styling
 	 */
+	/**
+	 * Build AJAX product cards using same structure as main widget
+	 */
+	private function build_ajax_product_cards( $products, $settings ) {
+		ob_start();
+		
+		while ( $products->have_posts() ) :
+			$products->the_post();
+			global $product;
+			?>
+			<div data-slot="card" class="product-card text-card-foreground group cursor-pointer" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+				<div class="product-image-wrapper">
+					<a href="<?php echo esc_url( get_permalink() ); ?>" class="product-link">
+						<?php echo woocommerce_get_product_thumbnail( 'woocommerce_thumbnail', [ 'class' => 'product-image' ] ); ?>
+					</a>
+					
+					<!-- Product Badges -->
+					<?php $this->render_ajax_product_badges( $product, $settings ); ?>
+					
+					<!-- Wishlist Button -->
+					<?php if ( 'yes' === $settings['show_wishlist_button'] ) : ?>
+					<button class="wishlist-button" aria-label="<?php esc_attr_e( 'Add to wishlist', 'slidefirePro-widgets' ); ?>">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon">
+							<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
+						</svg>
+					</button>
+					<?php endif; ?>
+					
+					<!-- Quick Add Overlay -->
+					<?php if ( 'yes' === $settings['show_quick_add_button'] ) : ?>
+					<div class="product-overlay">
+						<button class="quick-add-button" data-product-id="<?php echo esc_attr( get_the_ID() ); ?>">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
+								<circle cx="8" cy="21" r="1"></circle>
+								<circle cx="19" cy="21" r="1"></circle>
+								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+							</svg>
+							<?php echo esc_html( $settings['quick_add_text'] ?? 'Quick Add' ); ?>
+						</button>
+					</div>
+					<?php endif; ?>
+				</div>
+				
+				<div class="product-content">
+					<?php if ( 'yes' === $settings['show_category_badge'] ) : ?>
+					<div class="product-category-wrapper">
+						<?php $this->render_ajax_product_category_badge( $product ); ?>
+					</div>
+					<?php endif; ?>
+					
+					<h3 class="product-title">
+						<a href="<?php echo esc_url( get_permalink() ); ?>">
+							<?php echo esc_html( get_the_title() ); ?>
+						</a>
+					</h3>
+					
+					<div class="product-price-wrapper">
+						<?php echo $product->get_price_html(); ?>
+						<?php if ( $product->is_on_sale() && 'yes' === $settings['show_sale_badge'] ) : ?>
+							<?php $this->render_ajax_sale_percentage_badge( $product ); ?>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+			<?php
+		endwhile;
+		
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render product badges for AJAX (same as widget)
+	 */
+	private function render_ajax_product_badges( $product, $settings ) {
+		if ( $product->is_on_sale() && 'yes' === $settings['show_sale_badge'] ) {
+			echo '<span class="product-badge sale-badge">BESTSELLER</span>';
+		}
+		
+		if ( $product->is_featured() && 'yes' === $settings['show_featured_badge'] ) {
+			echo '<span class="product-badge featured-badge">FEATURED</span>';
+		}
+	}
+
+	/**
+	 * Render product category badge for AJAX (same as widget)
+	 */
+	private function render_ajax_product_category_badge( $product ) {
+		$categories = wp_get_post_terms( $product->get_id(), 'product_cat' );
+		if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+			$category = $categories[0];
+			echo '<span class="category-badge">' . esc_html( $category->name ) . '</span>';
+		}
+	}
+
+	/**
+	 * Render sale percentage badge for AJAX (same as widget)
+	 */
+	private function render_ajax_sale_percentage_badge( $product ) {
+		$regular_price = floatval( $product->get_regular_price() );
+		$sale_price = floatval( $product->get_sale_price() );
+		
+		if ( $regular_price > 0 && $sale_price > 0 ) {
+			$percentage = round( ( ( $regular_price - $sale_price ) / $regular_price ) * 100 );
+			echo '<span class="sale-percentage-badge">' . esc_html( $percentage . '% OFF' ) . '</span>';
+		}
+	}
+
 	private function customize_ajax_content( $content, $settings ) {
 		// Add our custom classes
 		$content = str_replace( 
