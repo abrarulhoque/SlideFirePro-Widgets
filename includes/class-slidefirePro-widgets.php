@@ -11,8 +11,7 @@ class SlideFirePro_Widgets {
 
 	public function __construct() {
 		add_action( 'elementor/widgets/register', [ $this, 'register_widgets' ] );
-		add_action( 'elementor/frontend/after_register_scripts', [ $this, 'register_widget_scripts' ] );
-		add_action( 'elementor/frontend/after_register_styles', [ $this, 'register_widget_styles' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'register_widget_assets' ] );
 		
 		// Register AJAX handlers
 		add_action( 'wp_ajax_slidefirePro_filter_products', [ $this, 'ajax_filter_products' ] );
@@ -20,14 +19,23 @@ class SlideFirePro_Widgets {
 	}
 
 	/**
-	 * Register widget scripts
+	 * Register widget assets (styles and scripts)
 	 */
-	public function register_widget_scripts() {
+	public function register_widget_assets() {
+		// Register widget styles
+		wp_register_style(
+			'slidefirePro-category-filter',
+			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
+			[],
+			SLIDEFIREPRO_WIDGETS_VERSION
+		);
+		
+		// Register widget scripts
 		wp_register_script(
 			'slidefirePro-category-filter',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/js/category-filter.js',
+			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			\SlideFirePro_Widgets_Core::VERSION,
+			SLIDEFIREPRO_WIDGETS_VERSION,
 			true
 		);
 		
@@ -36,18 +44,6 @@ class SlideFirePro_Widgets {
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'slidefirePro_filter_nonce' )
 		]);
-	}
-
-	/**
-	 * Register widget styles
-	 */
-	public function register_widget_styles() {
-		wp_register_style(
-			'slidefirePro-category-filter',
-			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/css/category-filter.css',
-			[],
-			\SlideFirePro_Widgets_Core::VERSION
-		);
 	}
 
 	/**
