@@ -43,7 +43,8 @@
     border: 1px solid var(--slidefire-border, #333333);
     background-color: var(--slidefire-input-background, #1a1a1a);
     padding: 0.25rem 0.75rem;
-    padding-left: 2.5rem; /* pl-10 */
+    /* Add a bit more left padding so placeholder/text clears the icon comfortably */
+    padding-left: 2.75rem; /* was 2.5rem */
     font-size: 0.875rem;
     line-height: 1.25rem;
     color: var(--slidefire-foreground, #ffffff);
