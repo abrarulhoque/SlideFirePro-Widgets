@@ -25,7 +25,7 @@ class SlideFirePro_Widgets {
 	public function register_widget_scripts() {
 		wp_register_script(
 			'slidefirePro-category-filter',
-			plugin_dir_url( __DIR__ ) . '../assets/js/category-filter.js',
+			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
 			\SlideFirePro_Widgets_Core::VERSION,
 			true
@@ -44,7 +44,7 @@ class SlideFirePro_Widgets {
 	public function register_widget_styles() {
 		wp_register_style(
 			'slidefirePro-category-filter',
-			plugin_dir_url( __DIR__ ) . '../assets/css/category-filter.css',
+			plugin_dir_url( dirname( __DIR__ ) ) . 'assets/css/category-filter.css',
 			[],
 			\SlideFirePro_Widgets_Core::VERSION
 		);

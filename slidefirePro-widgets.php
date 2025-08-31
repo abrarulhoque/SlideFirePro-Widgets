@@ -3,7 +3,7 @@
  * Plugin Name:       SlideFirePro Widgets
  * Plugin URI:        https://abrarulhoque.com/
  * Description:       A collection of custom Elementor widgets for SlideFirePro, including WooCommerce category filters and product grids.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 6.5
  * Requires PHP:      8.1
  * Author:            Abrar
@@ -20,7 +20,7 @@ if (! defined( 'ABSPATH' ) ) {
 
 final class SlideFirePro_Widgets_Core {
 
-	const VERSION = '1.1.0';
+	const VERSION = '1.2.0';
 
 	public function __construct() {
 		// Load our main plugin class after all plugins are loaded.
