@@ -247,7 +247,12 @@
         }
 
         handleProductFilter(e, data) {
-            this.filterProducts(data);
+            // Normalize payload for filterProducts (expects widget_id snake_case)
+            const payload = { ...data };
+            if (data && data.widgetId && !data.widget_id) {
+                payload.widget_id = data.widgetId;
+            }
+            this.filterProducts(payload);
         }
 
         handleProductsUpdated(e, data) {

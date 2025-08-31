@@ -16,11 +16,11 @@
             this.viewButtons = this.element.find('.wc-filter-view-button');
             this.container = this.element.find('.wc-filter-container');
             
-            // Filter state
+            // Filter state (use keys aligned with server + grid)
             this.filters = {
                 search: '',
                 category: '',
-                sort: '',
+                orderby: '',
                 view: this.getDefaultView()
             };
             
@@ -118,7 +118,7 @@
 
         handleSortChange(e) {
             const sortBy = $(e.target).val();
-            this.filters.sort = sortBy;
+            this.filters.orderby = sortBy;
             
             this.addLoadingState();
             this.triggerFilterEvent();
@@ -152,21 +152,23 @@
         }
 
         triggerFilterEvent() {
-            // Custom event that other widgets can listen to
-            const filterEvent = new CustomEvent('wcProductFilter', {
+            // Dispatch DOM CustomEvent for any vanilla listeners (back-compat)
+            const filterEvent = new CustomEvent('wcProductFilterChanged', {
                 detail: {
                     widgetId: this.widgetId,
                     filters: { ...this.filters },
                     timestamp: Date.now()
                 }
             });
-            
             document.dispatchEvent(filterEvent);
-            
-            // Also trigger jQuery event for compatibility
-            $(document).trigger('slideFirePro:productFilter', [{
+
+            // Trigger the event consumed by our products grid
+            $(document).trigger('slideFirePro:productFilterChanged', [{
                 widgetId: this.widgetId,
-                filters: { ...this.filters }
+                // Flatten payload keys expected by grid + server
+                category: this.filters.category,
+                search: this.filters.search,
+                orderby: this.filters.orderby,
             }]);
         }
 
@@ -182,8 +184,11 @@
                 this.categorySelect.val(newFilters.category);
             }
             
-            if (newFilters.sort !== undefined) {
-                this.filters.sort = newFilters.sort;
+            if (newFilters.orderby !== undefined) {
+                this.filters.orderby = newFilters.orderby;
+                this.sortSelect.val(newFilters.orderby);
+            } else if (newFilters.sort !== undefined) { // alias support
+                this.filters.orderby = newFilters.sort;
                 this.sortSelect.val(newFilters.sort);
             }
             
@@ -205,7 +210,7 @@
             this.filters = {
                 search: '',
                 category: '',
-                sort: '',
+                orderby: '',
                 view: this.getDefaultView()
             };
             
