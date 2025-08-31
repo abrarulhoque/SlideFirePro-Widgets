@@ -1,0 +1,221 @@
+/* SlideFirePro Category Filter Widget Styles */
+
+:root {
+	/* Exact colors from resources */
+	--slidefirePro-primary: #23B2EE;
+	--slidefirePro-background: #000000;
+	--slidefirePro-foreground: #ffffff;
+	--slidefirePro-card: #111111;
+	--slidefirePro-card-foreground: #ffffff;
+	--slidefirePro-border: #333333;
+	--slidefirePro-muted: #222222;
+	--slidefirePro-muted-foreground: #888888;
+	
+	/* Color variants from resource.css */
+	--slidefirePro-blue-400: oklch(0.707 0.165 254.624);
+	--slidefirePro-purple-400: oklch(0.714 0.203 305.504);
+	--slidefirePro-orange-400: oklch(0.75 0.183 55.934);
+}
+
+.slidefirePro-category-filter {
+	margin-bottom: 4rem;
+}
+
+.slidefirePro-category-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 1.5rem;
+}
+
+/* Responsive grid columns */
+@media (max-width: 1023px) {
+	.slidefirePro-category-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 767px) {
+	.slidefirePro-category-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* Category Filter Card */
+.category-filter-card {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	border-radius: 0.75rem;
+	border: 1px solid var(--slidefirePro-border);
+	background-color: var(--slidefirePro-card);
+	color: var(--slidefirePro-card-foreground);
+	cursor: pointer;
+	transition: all 0.3s ease;
+	outline: none;
+	position: relative;
+	overflow: hidden;
+}
+
+.category-filter-card:hover {
+	border-color: rgba(35, 178, 238, 0.5);
+	transform: translateY(-2px);
+}
+
+.category-filter-card:focus {
+	outline: 2px solid var(--slidefirePro-primary);
+	outline-offset: 2px;
+}
+
+/* Active state - matches the blue border in the image */
+.category-filter-card.active {
+	border-color: var(--slidefirePro-primary);
+	box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2);
+}
+
+/* Card Content */
+.card-content {
+	padding: 1.5rem;
+	text-align: center;
+}
+
+/* Icon Wrapper */
+.icon-wrapper {
+	margin-bottom: 1rem;
+	display: flex;
+	justify-content: center;
+}
+
+.icon-wrapper > i,
+.icon-wrapper > svg {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	background-color: var(--slidefirePro-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	transition: all 0.3s ease;
+}
+
+/* Icon Colors */
+.icon-wrapper.color-primary > i,
+.icon-wrapper.color-primary > svg {
+	color: var(--slidefirePro-primary);
+}
+
+.icon-wrapper.color-blue > i,
+.icon-wrapper.color-blue > svg {
+	color: var(--slidefirePro-blue-400);
+}
+
+.icon-wrapper.color-purple > i,
+.icon-wrapper.color-purple > svg {
+	color: var(--slidefirePro-purple-400);
+}
+
+.icon-wrapper.color-orange > i,
+.icon-wrapper.color-orange > svg {
+	color: var(--slidefirePro-orange-400);
+}
+
+/* Icon Hover Effects */
+.category-filter-card:hover .icon-wrapper > i,
+.category-filter-card:hover .icon-wrapper > svg {
+	background-color: rgba(35, 178, 238, 0.1);
+	transform: scale(1.1);
+}
+
+/* Category Title */
+.category-title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0;
+	color: var(--slidefirePro-card-foreground);
+	transition: color 0.3s ease;
+}
+
+.category-filter-card:hover .category-title {
+	color: var(--slidefirePro-primary);
+}
+
+/* Active state for title */
+.category-filter-card.active .category-title {
+	color: var(--slidefirePro-primary);
+}
+
+/* Loading State */
+.slidefirePro-category-filter.loading .category-filter-card {
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+/* Accessibility improvements */
+.category-filter-card[aria-pressed="true"] {
+	border-color: var(--slidefirePro-primary);
+	box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2);
+}
+
+/* Focus visible for better keyboard navigation */
+.category-filter-card:focus-visible {
+	outline: 2px solid var(--slidefirePro-primary);
+	outline-offset: 2px;
+}
+
+/* Animation for smooth transitions */
+@keyframes slideFirePro-pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
+.category-filter-card.active {
+	animation: slideFirePro-pulse 2s infinite;
+}
+
+/* RTL Support */
+[dir="rtl"] .slidefirePro-category-grid {
+	direction: rtl;
+}
+
+[dir="rtl"] .category-filter-card {
+	text-align: center;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+	.category-filter-card {
+		border-width: 2px;
+	}
+	
+	.category-filter-card:hover,
+	.category-filter-card.active {
+		border-width: 3px;
+	}
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+	.category-filter-card,
+	.icon-wrapper > i,
+	.icon-wrapper > svg,
+	.category-title {
+		transition: none;
+	}
+	
+	.category-filter-card:hover {
+		transform: none;
+	}
+	
+	.category-filter-card:hover .icon-wrapper > i,
+	.category-filter-card:hover .icon-wrapper > svg {
+		transform: none;
+	}
+	
+	.category-filter-card.active {
+		animation: none;
+	}
+}

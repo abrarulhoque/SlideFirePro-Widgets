@@ -1,0 +1,34 @@
+# Exclude everything except plugin files
+
+# Exclude WordPress/Elementor core files
+/elementor/
+/elementor-pro/
+
+# Exclude development/reference files
+/resources/
+CLAUDE.md
+/image.png
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+
+# Exclude system files
+.DS_Store
+Thumbs.db
+*.log
+
+# Include only plugin files
+!/slidefirePro-widgets.php
+!/includes/
+!/assets/
+
+# But exclude any images in assets
+/assets/**/*.png
+/assets/**/*.jpg
+/assets/**/*.jpeg
+/assets/**/*.gif
+/assets/**/*.svg
+/assets/**/*.webp
