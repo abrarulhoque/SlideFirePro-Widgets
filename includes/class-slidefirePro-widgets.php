@@ -116,78 +116,58 @@ class SlideFirePro_Widgets {
 		$settings = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
 		$widget_id = isset( $_POST['widget_id'] ) ? sanitize_text_field( $_POST['widget_id'] ) : '';
 
-		// Build query args
-		$query_args = [
-			'post_type' => 'product',
-			'post_status' => 'publish',
-			'posts_per_page' => isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12,
-			'meta_query' => [
-				[
-					'key' => '_visibility',
-					'value' => [ 'catalog', 'visible' ],
-					'compare' => 'IN',
-				],
-			],
+		// Build WooCommerce shortcode attributes
+		$shortcode_atts = [
+			'limit' => isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12,
+			'columns' => isset( $settings['columns'] ) ? intval( $settings['columns'] ) : 4,
+			'orderby' => 'menu_order',
+			'order' => 'ASC',
 		];
 
 		// Apply filters
 		if ( ! empty( $filters['category'] ) ) {
-			$query_args['tax_query'] = [
-				[
-					'taxonomy' => 'product_cat',
-					'field' => 'slug',
-					'terms' => sanitize_text_field( $filters['category'] ),
-				],
-			];
+			$shortcode_atts['category'] = sanitize_text_field( $filters['category'] );
 		}
 
 		if ( ! empty( $filters['search'] ) ) {
-			$query_args['s'] = sanitize_text_field( $filters['search'] );
+			// For search, we need to use a different approach
+			$shortcode_atts['ids'] = $this->get_search_product_ids( sanitize_text_field( $filters['search'] ) );
 		}
 
 		if ( ! empty( $filters['orderby'] ) ) {
 			$orderby = sanitize_text_field( $filters['orderby'] );
 			switch ( $orderby ) {
 				case 'popularity':
-					$query_args['meta_key'] = 'total_sales';
-					$query_args['orderby'] = 'meta_value_num';
-					$query_args['order'] = 'DESC';
+					$shortcode_atts['orderby'] = 'popularity';
 					break;
 				case 'rating':
-					$query_args['meta_key'] = '_wc_average_rating';
-					$query_args['orderby'] = 'meta_value_num';
-					$query_args['order'] = 'DESC';
+					$shortcode_atts['orderby'] = 'rating';
 					break;
 				case 'date':
-					$query_args['orderby'] = 'date';
-					$query_args['order'] = 'DESC';
+					$shortcode_atts['orderby'] = 'date';
+					$shortcode_atts['order'] = 'DESC';
 					break;
 				case 'price':
-					$query_args['meta_key'] = '_price';
-					$query_args['orderby'] = 'meta_value_num';
-					$query_args['order'] = 'ASC';
+					$shortcode_atts['orderby'] = 'price';
+					$shortcode_atts['order'] = 'ASC';
 					break;
 				case 'price-desc':
-					$query_args['meta_key'] = '_price';
-					$query_args['orderby'] = 'meta_value_num';
-					$query_args['order'] = 'DESC';
+					$shortcode_atts['orderby'] = 'price';
+					$shortcode_atts['order'] = 'DESC';
 					break;
 			}
 		}
 
-		// Add WooCommerce specific query filters
-		$query_args['meta_query'][] = WC()->query->get_meta_query();
-		$query_args['tax_query'] = array_merge( 
-			isset( $query_args['tax_query'] ) ? $query_args['tax_query'] : [], 
-			WC()->query->get_tax_query() 
-		);
+		// Use WooCommerce shortcode to get products
+		$shortcode = new \WC_Shortcode_Products( $shortcode_atts, 'products' );
+		$html = $shortcode->get_content();
 
-		$query = new WP_Query( $query_args );
-		$products = $query->posts;
+		// Customize the content
+		if ( ! empty( $html ) ) {
+			$html = $this->customize_ajax_content( $html, $settings );
+		}
 
-		// Generate HTML
-		$html = $this->generate_products_html( $products, $settings );
-		$has_more = $query->found_posts > count( $products );
+		$has_more = false; // For now, we'll implement pagination later
 
 		wp_send_json_success( [
 			'html' => $html,
@@ -213,38 +193,30 @@ class SlideFirePro_Widgets {
 		$settings = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
 		$products_per_page = isset( $settings['products_per_page'] ) ? intval( $settings['products_per_page'] ) : 12;
 
-		// Build query args (similar to filter products)
-		$query_args = [
-			'post_type' => 'product',
-			'post_status' => 'publish',
-			'posts_per_page' => $products_per_page,
-			'paged' => $page,
-			'meta_query' => [
-				[
-					'key' => '_visibility',
-					'value' => [ 'catalog', 'visible' ],
-					'compare' => 'IN',
-				],
-			],
+		// Build shortcode attributes for load more
+		$shortcode_atts = [
+			'limit' => $products_per_page,
+			'columns' => isset( $settings['columns'] ) ? intval( $settings['columns'] ) : 4,
+			'orderby' => 'menu_order',
+			'order' => 'ASC',
+			'page' => $page, // This might need to be handled differently
 		];
 
 		// Apply same filters as main query
 		if ( ! empty( $filters['category'] ) ) {
-			$query_args['tax_query'] = [
-				[
-					'taxonomy' => 'product_cat',
-					'field' => 'slug',
-					'terms' => sanitize_text_field( $filters['category'] ),
-				],
-			];
+			$shortcode_atts['category'] = sanitize_text_field( $filters['category'] );
 		}
 
-		$query = new WP_Query( $query_args );
-		$products = $query->posts;
+		// Use WooCommerce shortcode
+		$shortcode = new \WC_Shortcode_Products( $shortcode_atts, 'products' );
+		$html = $shortcode->get_content();
 
-		// Generate HTML
-		$html = $this->generate_products_html( $products, $settings );
-		$has_more = $query->max_num_pages > $page;
+		// Customize the content
+		if ( ! empty( $html ) ) {
+			$html = $this->customize_ajax_content( $html, $settings );
+		}
+
+		$has_more = false; // For now, simplified
 
 		wp_send_json_success( [
 			'html' => $html,
@@ -416,6 +388,44 @@ class SlideFirePro_Widgets {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Get product IDs for search query
+	 */
+	private function get_search_product_ids( $search_term ) {
+		$query = new WP_Query( [
+			'post_type' => 'product',
+			'post_status' => 'publish',
+			's' => $search_term,
+			'fields' => 'ids',
+			'posts_per_page' => 100, // Get more IDs for search
+		] );
+
+		return empty( $query->posts ) ? null : implode( ',', $query->posts );
+	}
+
+	/**
+	 * Customize AJAX content with our styling
+	 */
+	private function customize_ajax_content( $content, $settings ) {
+		// Add our custom classes
+		$content = str_replace( 
+			'class="products', 
+			'class="products slidefirePro-products-grid', 
+			$content 
+		);
+
+		// Add product-card class to list items
+		$content = preg_replace_callback(
+			'/<li class="([^"]*product[^"]*)"/',
+			function( $matches ) {
+				return '<li class="' . $matches[1] . ' product-card"';
+			},
+			$content
+		);
+
+		return $content;
 	}
 }
 
