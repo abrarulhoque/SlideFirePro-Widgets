@@ -1,244 +1,285 @@
-/* SlideFirePro Category Filter Widget Styles */
+/* SlideFirePro Category Filter - Exact Figma Design Match */
 
-/* High specificity wrapper to override theme styles */
-.elementor-widget-slidefirePro-category-filter .slidefirePro-category-filter,
-.slidefirePro-category-filter {
-	margin-bottom: 4rem !important;
-	width: 100% !important;
-	box-sizing: border-box !important;
+/* Custom CSS Variables matching your design system */
+:root {
+  --primary: #23B2EE;
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #111111;
+  --card-foreground: #ffffff;
+  --border: #333333;
+  --muted: #222222;
+  --muted-foreground: #888888;
+  --blue-400: oklch(0.707 0.165 254.624);
+  --purple-400: oklch(0.714 0.203 305.504);
+  --orange-400: oklch(0.75 0.183 55.934);
 }
 
-.elementor-widget-slidefirePro-category-filter .slidefirePro-category-grid,
-.slidefirePro-category-grid {
-	display: grid !important;
-	grid-template-columns: repeat(6, 1fr) !important;
-	gap: 1.5rem !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	list-style: none !important;
+/* Main container with exact spacing */
+.mb-16 {
+  margin-bottom: 4rem;
 }
 
-/* Responsive grid columns */
-@media (max-width: 1023px) {
-	.elementor-widget-slidefirePro-category-filter .slidefirePro-category-grid,
-	.slidefirePro-category-grid {
-		grid-template-columns: repeat(3, 1fr) !important;
-	}
+/* Grid layout matching your exact specifications */
+.grid {
+  display: grid;
 }
 
-@media (max-width: 767px) {
-	.elementor-widget-slidefirePro-category-filter .slidefirePro-category-grid,
-	.slidefirePro-category-grid {
-		grid-template-columns: repeat(2, 1fr) !important;
-	}
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* Category Filter Card */
-.elementor-widget-slidefirePro-category-filter .category-filter-card,
-.category-filter-card {
-	display: flex !important;
-	flex-direction: column !important;
-	gap: 1.5rem !important;
-	border-radius: 0.75rem !important;
-	border: 1px solid #333333 !important;
-	background-color: #111111 !important;
-	color: #ffffff !important;
-	cursor: pointer !important;
-	transition: all 0.3s ease !important;
-	outline: none !important;
-	position: relative !important;
-	overflow: hidden !important;
-	padding: 0 !important;
-	margin: 0 !important;
-	text-decoration: none !important;
-	min-height: 120px !important;
+.gap-6 {
+  gap: 1.5rem;
 }
 
-.elementor-widget-slidefirePro-category-filter .category-filter-card:hover,
-.category-filter-card:hover {
-	border-color: rgba(35, 178, 238, 0.5) !important;
-	transform: translateY(-2px) !important;
+/* Responsive grid - tablet */
+@media (min-width: 768px) {
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
-.elementor-widget-slidefirePro-category-filter .category-filter-card:focus,
-.category-filter-card:focus {
-	outline: 2px solid #23B2EE !important;
-	outline-offset: 2px !important;
+/* Responsive grid - desktop */
+@media (min-width: 1024px) {
+  .lg\:grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
 
-/* Active state - matches the blue border in the image */
-.elementor-widget-slidefirePro-category-filter .category-filter-card.active,
-.category-filter-card.active {
-	border-color: #23B2EE !important;
-	box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2) !important;
+/* Card styling - exact match to Figma */
+[data-slot="card"] {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  color: var(--card-foreground);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 120px;
 }
 
-/* Card Content */
-.elementor-widget-slidefirePro-category-filter .card-content,
-.card-content {
-	padding: 1.5rem !important;
-	text-align: center !important;
-	width: 100% !important;
-	box-sizing: border-box !important;
+/* Text and foreground colors */
+.text-card-foreground {
+  color: var(--card-foreground);
 }
 
-/* Icon Wrapper */
-.elementor-widget-slidefirePro-category-filter .icon-wrapper,
-.icon-wrapper {
-	margin-bottom: 1rem !important;
-	display: flex !important;
-	justify-content: center !important;
-	align-items: center !important;
+.bg-card {
+  background-color: var(--card);
 }
 
-.elementor-widget-slidefirePro-category-filter .icon-wrapper > i,
-.elementor-widget-slidefirePro-category-filter .icon-wrapper > svg,
-.icon-wrapper > i,
-.icon-wrapper > svg {
-	width: 4rem !important;
-	height: 4rem !important;
-	border-radius: 50% !important;
-	background-color: #222222 !important;
-	display: flex !important;
-	align-items: center !important;
-	justify-content: center !important;
-	font-size: 2rem !important;
-	transition: all 0.3s ease !important;
-	color: #23B2EE !important;
+.border-border {
+  border-color: var(--border);
 }
 
-/* Icon Colors */
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-primary > i,
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-primary > svg,
-.icon-wrapper.color-primary > i,
-.icon-wrapper.color-primary > svg {
-	color: #23B2EE !important;
+/* Active state - exactly matching your design */
+.border-primary {
+  border-color: var(--primary) !important;
 }
 
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-blue > i,
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-blue > svg,
-.icon-wrapper.color-blue > i,
-.icon-wrapper.color-blue > svg {
-	color: #60A5FA !important; /* Blue 400 fallback */
+.ring-2 {
+  box-shadow: 0 0 0 2px transparent;
 }
 
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-purple > i,
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-purple > svg,
-.icon-wrapper.color-purple > i,
-.icon-wrapper.color-purple > svg {
-	color: #A78BFA !important; /* Purple 400 fallback */
+.ring-primary\/20 {
+  box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2) !important;
 }
 
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-orange > i,
-.elementor-widget-slidefirePro-category-filter .icon-wrapper.color-orange > svg,
-.icon-wrapper.color-orange > i,
-.icon-wrapper.color-orange > svg {
-	color: #FB923C !important; /* Orange 400 fallback */
+/* Hover effects */
+[data-slot="card"]:hover {
+  border-color: rgba(35, 178, 238, 0.5);
 }
 
-/* Icon Hover Effects */
-.elementor-widget-slidefirePro-category-filter .category-filter-card:hover .icon-wrapper > i,
-.elementor-widget-slidefirePro-category-filter .category-filter-card:hover .icon-wrapper > svg,
-.category-filter-card:hover .icon-wrapper > i,
-.category-filter-card:hover .icon-wrapper > svg {
-	background-color: rgba(35, 178, 238, 0.1) !important;
-	transform: scale(1.1) !important;
+.hover\:border-primary\/50:hover {
+  border-color: rgba(35, 178, 238, 0.5);
 }
 
-/* Category Title */
-.elementor-widget-slidefirePro-category-filter .category-title,
-.category-title {
-	font-size: 1rem !important;
-	font-weight: 600 !important;
-	margin: 0 !important;
-	color: #ffffff !important;
-	transition: color 0.3s ease !important;
-	text-align: center !important;
+/* Transition effects */
+.transition-all {
+  transition: all 0.3s ease;
 }
 
-.elementor-widget-slidefirePro-category-filter .category-filter-card:hover .category-title,
-.category-filter-card:hover .category-title {
-	color: #23B2EE !important;
+.duration-300 {
+  transition-duration: 0.3s;
 }
 
-/* Active state for title */
-.elementor-widget-slidefirePro-category-filter .category-filter-card.active .category-title,
-.category-filter-card.active .category-title {
-	color: #23B2EE !important;
+/* Group hover effects */
+.group {
+  position: relative;
 }
 
-/* Loading State */
-.slidefirePro-category-filter.loading .category-filter-card {
-	pointer-events: none;
-	opacity: 0.6;
+/* Card content padding */
+.p-6 {
+  padding: 1.5rem;
 }
 
-/* Accessibility improvements */
-.category-filter-card[aria-pressed="true"] {
-	border-color: var(--slidefirePro-primary);
-	box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2);
+.text-center {
+  text-align: center;
 }
 
-/* Focus visible for better keyboard navigation */
-.category-filter-card:focus-visible {
-	outline: 2px solid var(--slidefirePro-primary);
-	outline-offset: 2px;
+/* Icon container styling */
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
-/* Animation for smooth transitions */
-@keyframes slideFirePro-pulse {
-	0%, 100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.7;
-	}
+.flex {
+  display: flex;
 }
 
-.category-filter-card.active {
-	animation: slideFirePro-pulse 2s infinite;
+.justify-center {
+  justify-content: center;
 }
 
-/* RTL Support */
-[dir="rtl"] .slidefirePro-category-grid {
-	direction: rtl;
+.items-center {
+  align-items: center;
 }
 
-[dir="rtl"] .category-filter-card {
-	text-align: center;
+/* Icon circle - exact sizing */
+.w-16 {
+  width: 4rem;
+}
+
+.h-16 {
+  height: 4rem;
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+
+.bg-muted {
+  background-color: var(--muted);
+}
+
+/* Icon hover effects */
+.group-hover\:bg-primary\/10:is(.group:hover *) {
+  background-color: rgba(35, 178, 238, 0.1);
+}
+
+.transition-colors {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Icon sizing */
+.w-8 {
+  width: 2rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+/* Icon colors - exact matches */
+.text-primary {
+  color: var(--primary);
+}
+
+.text-blue-400 {
+  color: var(--blue-400);
+}
+
+.text-purple-400 {
+  color: var(--purple-400);
+}
+
+.text-orange-400 {
+  color: var(--orange-400);
+}
+
+/* Icon hover scale effect */
+.group-hover\:scale-110:is(.group:hover *) {
+  transform: scale(1.1);
+}
+
+.transition-transform {
+  transition: transform 0.3s ease;
+}
+
+/* Typography */
+.font-semibold {
+  font-weight: 600;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Title hover color change */
+.group-hover\:text-primary:is(.group:hover *) {
+  color: var(--primary);
+}
+
+/* Active state for clicked cards */
+[data-slot="card"].active {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.2) !important;
+}
+
+[data-slot="card"].active h3 {
+  color: var(--primary);
+}
+
+/* Focus states for accessibility */
+[data-slot="card"]:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Responsive text sizing */
+h3 {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  h3 {
+    font-size: 1.125rem;
+  }
+}
+
+/* Loading states */
+[data-widget-id].loading [data-slot="card"] {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-	.category-filter-card {
-		border-width: 2px;
-	}
-	
-	.category-filter-card:hover,
-	.category-filter-card.active {
-		border-width: 3px;
-	}
+  [data-slot="card"] {
+    border-width: 2px;
+  }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-	.category-filter-card,
-	.icon-wrapper > i,
-	.icon-wrapper > svg,
-	.category-title {
-		transition: none;
-	}
-	
-	.category-filter-card:hover {
-		transform: none;
-	}
-	
-	.category-filter-card:hover .icon-wrapper > i,
-	.category-filter-card:hover .icon-wrapper > svg {
-		transform: none;
-	}
-	
-	.category-filter-card.active {
-		animation: none;
-	}
+  .transition-all,
+  .transition-colors,
+  .transition-transform {
+    transition: none;
+  }
+  
+  .group-hover\:scale-110:is(.group:hover *) {
+    transform: none;
+  }
+}
+
+/* RTL support */
+[dir="rtl"] .grid {
+  direction: rtl;
+}
+
+/* Ensure proper stacking */
+[data-slot="card"] {
+  z-index: 1;
+}
+
+[data-slot="card"]:hover {
+  z-index: 2;
+}
+
+[data-slot="card"].active {
+  z-index: 3;
 }

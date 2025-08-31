@@ -10,7 +10,7 @@
         constructor(element) {
             this.element = element;
             this.widgetId = element.data('widget-id');
-            this.cards = element.find('.category-filter-card');
+            this.cards = element.find('[data-slot="card"]');
             this.isLoading = false;
             
             this.init();
@@ -45,8 +45,22 @@
             // First card should be active by default
             const firstCard = this.cards.first();
             if (firstCard.length) {
-                firstCard.addClass('active').attr('aria-pressed', 'true');
+                this.setCardActive(firstCard);
             }
+        }
+
+        setCardActive(card) {
+            // Remove active classes from all cards
+            this.cards.each((index, element) => {
+                const $card = $(element);
+                $card.removeClass('border-primary ring-2 ring-primary/20 active');
+                $card.addClass('border-border');
+            });
+
+            // Add active classes to selected card
+            card.removeClass('border-border');
+            card.addClass('border-primary ring-2 ring-primary/20 active');
+            card.attr('aria-pressed', 'true');
         }
 
         handleCardClick(clickedCard) {
@@ -54,15 +68,12 @@
                 return;
             }
 
-            // Remove active state from all cards
-            this.cards.removeClass('active').attr('aria-pressed', 'false');
-            
-            // Add active state to clicked card
-            clickedCard.addClass('active').attr('aria-pressed', 'true');
+            // Set active state
+            this.setCardActive(clickedCard);
 
             // Get category slug
             const categorySlug = clickedCard.data('category') || '';
-            const categoryTitle = clickedCard.find('.category-title').text();
+            const categoryTitle = clickedCard.find('h3').text();
 
             // Trigger custom event for product filtering
             $(document).trigger('slideFirePro:categoryChanged', {
@@ -207,7 +218,7 @@
 
     // Initialize widget on DOM ready and Elementor frontend init
     function initCategoryFilters() {
-        $('.slidefirePro-category-filter').each(function() {
+        $('[data-widget-id]').each(function() {
             const $this = $(this);
             
             // Avoid double initialization
@@ -215,9 +226,12 @@
                 return;
             }
             
-            const filterInstance = new SlideFireProCategoryFilter($this);
-            $this.data('slideFirePro-initialized', true);
-            $this.data('slideFirePro-instance', filterInstance);
+            // Only initialize if it contains category cards
+            if ($this.find('[data-slot="card"]').length > 0) {
+                const filterInstance = new SlideFireProCategoryFilter($this);
+                $this.data('slideFirePro-initialized', true);
+                $this.data('slideFirePro-instance', filterInstance);
+            }
         });
     }
 
