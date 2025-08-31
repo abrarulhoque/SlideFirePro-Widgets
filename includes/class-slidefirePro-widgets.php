@@ -27,7 +27,7 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			plugin_dir_url( __DIR__ ) . '../assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-			SlideFirePro_Widgets_Core::VERSION,
+			\SlideFirePro_Widgets_Core::VERSION,
 			true
 		);
 		
@@ -46,7 +46,7 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			plugin_dir_url( __DIR__ ) . '../assets/css/category-filter.css',
 			[],
-			SlideFirePro_Widgets_Core::VERSION
+			\SlideFirePro_Widgets_Core::VERSION
 		);
 	}
 
