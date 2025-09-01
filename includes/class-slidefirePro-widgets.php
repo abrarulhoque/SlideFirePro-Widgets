@@ -116,14 +116,14 @@ class SlideFirePro_Widgets {
             'slidefire-product-features',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-features.css',
             [],
-            '1.15.0'
+            '1.16.0'
         );
 
         wp_register_script(
             'slidefire-product-features',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-features.js',
             [ 'jquery', 'elementor-frontend' ],
-            '1.15.0',
+            '1.16.0',
             true
         );
 		
