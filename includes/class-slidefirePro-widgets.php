@@ -36,14 +36,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-            '1.14.0'
+            '1.15.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 		
@@ -52,14 +52,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-            '1.14.0'
+            '1.15.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 		
@@ -68,14 +68,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-            '1.14.0'
+            '1.15.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 
@@ -84,14 +84,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-header-navigation',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/header-navigation.css',
 			[],
-            '1.14.0'
+            '1.15.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-header-navigation',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/header-navigation.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 
@@ -100,14 +100,14 @@ class SlideFirePro_Widgets {
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-customizer.css',
             [],
-            '1.14.0'
+            '1.15.0'
         );
 
         wp_register_script(
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-customizer.js',
             [ 'jquery', 'elementor-frontend', 'wc-add-to-cart-variation' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 
@@ -116,14 +116,14 @@ class SlideFirePro_Widgets {
             'slidefire-product-features',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-features.css',
             [],
-            '1.14.0'
+            '1.15.0'
         );
 
         wp_register_script(
             'slidefire-product-features',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-features.js',
             [ 'jquery', 'elementor-frontend' ],
-            '1.14.0',
+            '1.15.0',
             true
         );
 		

@@ -1,25 +1,30 @@
-/* Product Features Widget - Exact match to ProductPage.tsx */
+/* Product Features Widget - Exact match to Figma design */
 
+/* Import design system variables */
 .slidefire-product-features {
     width: 100%;
+    font-family: 'Roboto', sans-serif;
 }
 
-/* Tabs Layout */
+/* Tabs Layout - Matching resource.css patterns */
 .product-features-tabs {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
     width: 100%;
 }
 
 .tabs-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-    background-color: var(--card);
-    border-radius: 12px;
+    background-color: var(--muted);
+    color: var(--muted-foreground);
+    display: inline-flex;
+    height: 2.25rem;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(var(--radius) + 4px);
     padding: 3px;
-    border: 1px solid var(--border);
+    display: flex;
 }
 
 .tabs-trigger {
@@ -28,33 +33,44 @@
     flex: 1;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    border-radius: 12px;
+    gap: 0.375rem;
+    border-radius: calc(var(--radius) + 4px);
     border: 1px solid transparent;
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
     font-weight: 500;
     white-space: nowrap;
     transition: color 0.2s, box-shadow 0.2s;
     cursor: pointer;
     background: none;
-    color: var(--muted-foreground);
+    color: var(--foreground);
+    border: 1px solid transparent;
+    outline: none;
+    disabled: pointer-events-none opacity-50;
 }
 
 .tabs-trigger:focus-visible {
+    border-color: var(--ring);
+    ring: 3px;
+    ring-color: rgba(35, 178, 238, 0.5);
     outline: 1px solid var(--ring);
-    ring: 3px solid rgba(var(--ring), 0.5);
 }
 
 .tabs-trigger.active {
     background-color: var(--card);
     color: var(--foreground);
     border-color: var(--input);
-    background-color: rgba(var(--input), 0.3);
+    background-color: var(--input);
+}
+
+.dark .tabs-trigger.active {
+    color: var(--foreground);
+    border-color: var(--input);
+    background-color: rgba(26, 26, 26, 0.3);
 }
 
 .tabs-content-wrapper {
-    margin-top: 32px;
+    margin-top: 2rem;
 }
 
 .tabs-content {
@@ -67,11 +83,11 @@
     display: block;
 }
 
-/* Features Grid */
+/* Features Grid - Matching the two-column layout from image */
 .features-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 2rem;
 }
 
 @media (min-width: 1024px) {
@@ -80,76 +96,87 @@
     }
 }
 
-/* Card Styles - Matching React Card component */
+/* Card Styles - Exact match to design system */
 .product-features-card {
     background-color: var(--card);
     color: var(--card-foreground);
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    border-radius: 12px;
+    gap: 1.5rem;
+    border-radius: calc(var(--radius) + 4px);
     border: 1px solid var(--border);
-    padding: 24px;
+    padding: 1.5rem;
 }
 
-/* Typography */
+/* Typography - Following exact design system */
 .product-features-heading {
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 600;
     line-height: 1;
-    margin: 0 0 16px 0;
+    margin: 0 0 1rem 0;
     color: var(--foreground);
+    font-family: var(--title-font);
 }
 
 .product-features-text {
     color: var(--muted-foreground);
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.5;
+    font-family: var(--body-font);
 }
 
-/* Features List */
+/* Features List - Matching the bullet point style from image */
 .features-list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+}
+
+.features-list > :not(:last-child) {
+    margin-bottom: calc(0.75rem * (1 - 0));
+    margin-top: calc(0.75rem * 0);
 }
 
 .feature-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 0.75rem;
 }
 
+/* Blue bullet points - exact size and color from image */
 .feature-bullet {
-    width: 8px;
-    height: 8px;
+    width: 0.5rem;
+    height: 0.5rem;
     background-color: var(--primary);
     border-radius: 50%;
-    margin-top: 8px;
+    margin-top: 0.5rem;
     flex-shrink: 0;
 }
 
-/* Shipping Info */
+/* Shipping Info - Matching the icon and text layout */
 .shipping-info {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+}
+
+.shipping-info > :not(:last-child) {
+    margin-bottom: calc(1rem * (1 - 0));
+    margin-top: calc(1rem * 0);
 }
 
 .shipping-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 0.75rem;
 }
 
 .shipping-icon {
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     color: var(--primary);
-    margin-top: 2px;
+    margin-top: 0.125rem;
     flex-shrink: 0;
 }
 
@@ -159,18 +186,20 @@
 
 .shipping-title {
     font-weight: 500;
-    margin: 0 0 4px 0;
-    font-size: 14px;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.875rem;
     color: var(--foreground);
+    font-family: var(--body-font);
 }
 
 .shipping-note {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: var(--muted-foreground);
-    margin: 4px 0 0 0;
+    margin: 0.25rem 0 0 0;
+    font-family: var(--body-font);
 }
 
-/* Specifications */
+/* Specifications - Matching the table layout from image */
 .specifications-card {
     grid-column: 1 / -1;
 }
@@ -178,14 +207,25 @@
 .specifications-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+}
+
+.specifications-list > :not(:last-child) {
+    margin-bottom: calc(1rem * (1 - 0));
+    margin-top: calc(1rem * 0);
 }
 
 .specification-item {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(var(--border), 0.5);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid;
+    border-color: var(--border);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+    .specification-item {
+        border-color: color-mix(in oklab, var(--border) 50%, transparent);
+    }
 }
 
 .specification-item:last-child {
@@ -195,47 +235,56 @@
 .spec-name {
     font-weight: 500;
     color: var(--foreground);
-    font-size: 14px;
+    font-size: 0.875rem;
+    font-family: var(--body-font);
 }
 
 .spec-value {
     color: var(--muted-foreground);
-    font-size: 14px;
+    font-size: 0.875rem;
     text-align: right;
+    font-family: var(--body-font);
 }
 
 /* Stacked Layout */
 .slidefire-product-features[data-layout="stacked"] .features-grid {
-    margin-bottom: 32px;
+    margin-bottom: 2rem;
 }
 
 .stacked-section-spacing {
-    margin: 32px 0;
+    margin: 2rem 0;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design - Mobile first approach */
+@media (width >= 48rem) {
     .features-grid {
         grid-template-columns: 1fr;
-        gap: 24px;
     }
-    
+}
+
+@media (width >= 64rem) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
     .product-features-card {
-        padding: 20px;
+        padding: 1.25rem;
     }
     
     .tabs-trigger {
-        padding: 6px 12px;
-        font-size: 13px;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
     }
     
     .product-features-heading {
-        font-size: 18px;
+        font-size: 1.125rem;
     }
     
     .specification-item {
         flex-direction: column;
-        gap: 4px;
+        gap: 0.25rem;
         align-items: flex-start;
     }
     
@@ -244,13 +293,11 @@
     }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .tabs-trigger.active {
-        color: var(--foreground);
-        border-color: var(--input);
-        background-color: var(--input);
-    }
+/* Focus and interaction states */
+.tabs-trigger:focus-visible {
+    border-color: var(--ring);
+    ring: 3px solid rgba(35, 178, 238, 0.5);
+    outline: 1px solid var(--ring);
 }
 
 /* Elementor editor compatibility */
@@ -260,7 +307,7 @@
 
 .elementor-editor-active .tabs-content {
     display: block !important;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
 }
 
 .elementor-editor-active .tabs-content:not(:last-child)::after {
@@ -268,5 +315,10 @@
     display: block;
     height: 1px;
     background: var(--border);
-    margin: 20px 0;
+    margin: 1.25rem 0;
+}
+
+/* Animation and transitions */
+.product-features-card {
+    transition: all 0.3s;
 }
