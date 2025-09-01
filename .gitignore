@@ -3,6 +3,8 @@
 # Exclude WordPress/Elementor core files
 /elementor/
 /elementor-pro/
+/woo-custom-product-addons/
+/components/
 
 # Exclude development/reference files
 /resources/

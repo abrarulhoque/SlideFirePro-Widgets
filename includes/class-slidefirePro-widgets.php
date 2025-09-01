@@ -33,14 +33,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/category-filter.css',
 			[],
-            '1.12.0'
+            '1.13.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-category-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/category-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.12.0',
+            '1.13.0',
             true
         );
 		
@@ -49,14 +49,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-filter.css',
 			[],
-            '1.12.0'
+            '1.13.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-wc-product-filter',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-product-filter.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.12.0',
+            '1.13.0',
             true
         );
 		
@@ -65,14 +65,14 @@ class SlideFirePro_Widgets {
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
 			[],
-            '1.12.0'
+            '1.13.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-wc-products',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.12.0',
+            '1.13.0',
             true
         );
 
@@ -81,14 +81,30 @@ class SlideFirePro_Widgets {
 			'slidefirePro-header-navigation',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/header-navigation.css',
 			[],
-            '1.12.0'
+            '1.13.0'
         );
 		
 		wp_register_script(
 			'slidefirePro-header-navigation',
 			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/header-navigation.js',
 			[ 'jquery', 'elementor-frontend' ],
-            '1.12.0',
+            '1.13.0',
+            true
+        );
+
+        // Register product customizer assets
+        wp_register_style(
+            'slidefirePro-product-customizer',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-customizer.css',
+            [],
+            '1.13.0'
+        );
+
+        wp_register_script(
+            'slidefirePro-product-customizer',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-customizer.js',
+            [ 'jquery', 'elementor-frontend', 'wc-add-to-cart-variation' ],
+            '1.13.0',
             true
         );
 		
@@ -101,6 +117,7 @@ class SlideFirePro_Widgets {
 		wp_localize_script( 'slidefirePro-category-filter', 'slideFireProAjax', $ajax_data );
 		wp_localize_script( 'slidefirePro-wc-product-filter', 'slideFireProAjax', $ajax_data );
 		wp_localize_script( 'slidefirePro-wc-products', 'slideFireProAjax', $ajax_data );
+		wp_localize_script( 'slidefirePro-product-customizer', 'slideFireProAjax', $ajax_data );
 	}
 
 	/**
@@ -112,12 +129,14 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-wc-product-filter-widget.php' );
 		require_once( __DIR__. '/widgets/class-wc-products-widget.php' );
 		require_once( __DIR__. '/widgets/class-header-navigation-widget.php' );
+		require_once( __DIR__. '/widgets/class-product-customizer-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
 		$widgets_manager->register( new Widgets\WC_Product_Filter_Widget() );
 		$widgets_manager->register( new Widgets\WC_Products_Widget() );
 		$widgets_manager->register( new Widgets\Header_Navigation_Widget() );
+		$widgets_manager->register( new Widgets\Product_Customizer_Widget() );
 	}
 
     /**
