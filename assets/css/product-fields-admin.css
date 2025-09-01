@@ -1,0 +1,95 @@
+/* SlideFirePro Product Fields Admin Styles */
+
+.slidefire-repeater-items {
+    margin-bottom: 15px;
+}
+
+.slidefire-repeater-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    position: relative;
+}
+
+.slidefire-repeater-item input[type="text"] {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.slidefire-repeater-item .remove-item {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.slidefire-repeater-item .remove-item:hover {
+    background: #c82333;
+}
+
+.add-feature-item,
+.add-specification-item {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.add-feature-item:hover,
+.add-specification-item:hover {
+    background: #005a87;
+}
+
+#slidefire_features_options h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#slidefire_features_options .options_group {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+#slidefire_features_options .options_group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Specifications specific styling */
+#slidefire-specifications-repeater .slidefire-repeater-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+}
+
+#slidefire-specifications-repeater .slidefire-repeater-item input {
+    flex: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+    #slidefire-specifications-repeater .slidefire-repeater-item {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    #slidefire-specifications-repeater .slidefire-repeater-item input {
+        width: 100% !important;
+    }
+}

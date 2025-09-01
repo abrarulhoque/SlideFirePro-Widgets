@@ -1,0 +1,272 @@
+/* Product Features Widget - Exact match to ProductPage.tsx */
+
+.slidefire-product-features {
+    width: 100%;
+}
+
+/* Tabs Layout */
+.product-features-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.tabs-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    background-color: var(--card);
+    border-radius: 12px;
+    padding: 3px;
+    border: 1px solid var(--border);
+}
+
+.tabs-trigger {
+    display: inline-flex;
+    height: calc(100% - 1px);
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    background: none;
+    color: var(--muted-foreground);
+}
+
+.tabs-trigger:focus-visible {
+    outline: 1px solid var(--ring);
+    ring: 3px solid rgba(var(--ring), 0.5);
+}
+
+.tabs-trigger.active {
+    background-color: var(--card);
+    color: var(--foreground);
+    border-color: var(--input);
+    background-color: rgba(var(--input), 0.3);
+}
+
+.tabs-content-wrapper {
+    margin-top: 32px;
+}
+
+.tabs-content {
+    flex: 1;
+    outline: none;
+    display: none;
+}
+
+.tabs-content.active {
+    display: block;
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+@media (min-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Card Styles - Matching React Card component */
+.product-features-card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 24px;
+}
+
+/* Typography */
+.product-features-heading {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0 0 16px 0;
+    color: var(--foreground);
+}
+
+.product-features-text {
+    color: var(--muted-foreground);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Features List */
+.features-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.feature-bullet {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+/* Shipping Info */
+.shipping-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.shipping-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.shipping-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.shipping-content {
+    flex: 1;
+}
+
+.shipping-title {
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: var(--foreground);
+}
+
+.shipping-note {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    margin: 4px 0 0 0;
+}
+
+/* Specifications */
+.specifications-card {
+    grid-column: 1 / -1;
+}
+
+.specifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.specification-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(var(--border), 0.5);
+}
+
+.specification-item:last-child {
+    border-bottom: none;
+}
+
+.spec-name {
+    font-weight: 500;
+    color: var(--foreground);
+    font-size: 14px;
+}
+
+.spec-value {
+    color: var(--muted-foreground);
+    font-size: 14px;
+    text-align: right;
+}
+
+/* Stacked Layout */
+.slidefire-product-features[data-layout="stacked"] .features-grid {
+    margin-bottom: 32px;
+}
+
+.stacked-section-spacing {
+    margin: 32px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .product-features-card {
+        padding: 20px;
+    }
+    
+    .tabs-trigger {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .product-features-heading {
+        font-size: 18px;
+    }
+    
+    .specification-item {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+    
+    .spec-value {
+        text-align: left;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .tabs-trigger.active {
+        color: var(--foreground);
+        border-color: var(--input);
+        background-color: var(--input);
+    }
+}
+
+/* Elementor editor compatibility */
+.elementor-editor-active .tabs-trigger {
+    pointer-events: none;
+}
+
+.elementor-editor-active .tabs-content {
+    display: block !important;
+    margin-bottom: 20px;
+}
+
+.elementor-editor-active .tabs-content:not(:last-child)::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
