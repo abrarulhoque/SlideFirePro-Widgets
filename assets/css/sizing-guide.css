@@ -1,0 +1,428 @@
+/* SlideFirePro Sizing Guide Widget CSS */
+
+/* CSS Variables from the codebase */
+:root {
+    --slidefire-primary: #23B2EE;
+    --slidefire-primary-foreground: #000000;
+    --slidefire-background: #000000;
+    --slidefire-foreground: #ffffff;
+    --slidefire-card: #111111;
+    --slidefire-card-foreground: #ffffff;
+    --slidefire-muted: #222222;
+    --slidefire-muted-foreground: #888888;
+    --slidefire-border: #333333;
+}
+
+/* Main Wrapper */
+.slidefire-sizing-guide-wrapper {
+    margin-top: 3rem;
+}
+
+/* Card Container */
+.sizing-guide-card {
+    padding: 2rem;
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.75rem;
+    color: var(--slidefire-card-foreground);
+}
+
+/* Header Section */
+.sizing-guide-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.sizing-guide-title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.sizing-guide-icon {
+    height: 1.5rem;
+    width: 1.5rem;
+    color: var(--slidefire-primary);
+}
+
+.sizing-guide-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--slidefire-foreground);
+}
+
+.sizing-guide-description {
+    color: var(--slidefire-muted-foreground);
+    max-width: 42rem;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Main Content Grid */
+.sizing-guide-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .sizing-guide-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Measurement Section */
+.measurement-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.measurement-diagram {
+    position: relative;
+    background: linear-gradient(to bottom right, rgba(34, 34, 34, 0.2), var(--slidefire-background));
+    border-radius: 0.75rem;
+    padding: 2rem;
+}
+
+.diagram-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.measurement-badge {
+    display: inline-block;
+    background-color: rgba(35, 178, 238, 0.1);
+    color: var(--slidefire-primary);
+    border: 1px solid rgba(35, 178, 238, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Jersey Diagram */
+.jersey-diagram {
+    position: relative;
+    margin: 0 auto;
+    width: 16rem;
+    height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jersey-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.measurement-label {
+    fill: var(--slidefire-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+}
+
+.measurement-label-small {
+    fill: var(--slidefire-primary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Measurement Notes */
+.measurement-notes {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--slidefire-muted-foreground);
+}
+
+.measurement-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-icon {
+    height: 1rem;
+    width: 1rem;
+    color: var(--slidefire-primary);
+    flex-shrink: 0;
+}
+
+/* Sizing Table Section */
+.sizing-table-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sizing-table-wrapper {
+    background: linear-gradient(to right, rgba(35, 178, 238, 0.05), rgba(66, 153, 225, 0.05));
+    border-radius: 0.75rem;
+    padding: 1px;
+}
+
+.sizing-table-card {
+    background-color: var(--slidefire-card);
+    border-radius: calc(0.75rem - 1px);
+    overflow: hidden;
+}
+
+.sizing-table-header {
+    background-color: rgba(35, 178, 238, 0.1);
+    padding: 1rem;
+    border-bottom: 1px solid var(--slidefire-border);
+}
+
+.sizing-table-title {
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+    color: var(--slidefire-foreground);
+}
+
+.sizing-table-container {
+    overflow-x: auto;
+}
+
+.sizing-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+}
+
+.sizing-table thead tr {
+    background-color: rgba(34, 34, 34, 0.2);
+    border-bottom: 1px solid var(--slidefire-border);
+}
+
+.sizing-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--slidefire-foreground);
+}
+
+.sizing-table th:first-child {
+    text-align: left;
+}
+
+.sizing-table th:not(:first-child) {
+    text-align: center;
+}
+
+.sizing-table tbody tr {
+    border-bottom: 1px solid rgba(51, 51, 51, 0.5);
+    transition: background-color 0.2s ease;
+}
+
+.sizing-table tbody tr:hover {
+    background-color: rgba(35, 178, 238, 0.05);
+}
+
+.sizing-table tbody tr.even-row {
+    background-color: rgba(34, 34, 34, 0.1);
+}
+
+.sizing-table tbody tr.odd-row {
+    background-color: transparent;
+}
+
+.sizing-table td {
+    padding: 0.75rem;
+    color: var(--slidefire-card-foreground);
+}
+
+.size-badge {
+    display: inline-block;
+    border: 1px solid var(--slidefire-border);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    background-color: transparent;
+    color: var(--slidefire-foreground);
+}
+
+.measurement-value {
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Fitting Tips Card */
+.fitting-tips-card {
+    padding: 1rem;
+    background-color: rgba(35, 178, 238, 0.05);
+    border: 1px solid rgba(35, 178, 238, 0.2);
+    border-radius: 0.5rem;
+}
+
+.fitting-tips-title {
+    font-weight: 600;
+    color: var(--slidefire-primary);
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+}
+
+.fitting-tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fitting-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--slidefire-muted-foreground);
+    line-height: 1.5;
+}
+
+.tip-bullet {
+    width: 0.375rem;
+    height: 0.375rem;
+    background-color: var(--slidefire-primary);
+    border-radius: 50%;
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    .sizing-guide-card {
+        padding: 1.5rem;
+    }
+    
+    .sizing-guide-content {
+        gap: 2rem;
+    }
+    
+    .measurement-diagram {
+        padding: 1.5rem;
+    }
+    
+    .jersey-diagram {
+        width: 14rem;
+        height: 18rem;
+    }
+    
+    .sizing-table-container {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .sizing-table {
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slidefire-sizing-guide-wrapper {
+        margin-top: 2rem;
+    }
+    
+    .sizing-guide-card {
+        padding: 1rem;
+    }
+    
+    .sizing-guide-title {
+        font-size: 1.25rem;
+    }
+    
+    .jersey-diagram {
+        width: 12rem;
+        height: 15rem;
+    }
+    
+    .measurement-diagram {
+        padding: 1rem;
+    }
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+    .slidefire-sizing-guide-wrapper {
+        /* Already styled for dark theme by default */
+    }
+}
+
+/* Print styles */
+@media print {
+    .slidefire-sizing-guide-wrapper {
+        margin-top: 0;
+    }
+    
+    .sizing-guide-card {
+        border: 1px solid #333;
+        background: white;
+        color: black;
+    }
+    
+    .sizing-guide-title,
+    .sizing-guide-description,
+    .measurement-label,
+    .measurement-label-small {
+        color: black !important;
+    }
+    
+    .sizing-table th,
+    .sizing-table td {
+        color: black;
+    }
+    
+    .size-badge {
+        border-color: #333;
+        color: black;
+    }
+}
+
+/* Animation for smooth interactions */
+.sizing-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.measurement-badge {
+    transition: all 0.2s ease;
+}
+
+.fitting-tips-card {
+    transition: all 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+.sizing-table:focus {
+    outline: 2px solid var(--slidefire-primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .sizing-guide-card {
+        border-width: 2px;
+    }
+    
+    .size-badge {
+        border-width: 2px;
+    }
+    
+    .measurement-badge {
+        border-width: 2px;
+    }
+    
+    .fitting-tips-card {
+        border-width: 2px;
+    }
+}

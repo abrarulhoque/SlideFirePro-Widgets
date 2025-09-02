@@ -142,6 +142,14 @@ class SlideFirePro_Widgets {
             [],
             '1.21.1'
         );
+
+        // Register sizing guide assets
+        wp_register_style(
+            'slidefirePro-sizing-guide',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/sizing-guide.css',
+            [],
+            '1.21.0'
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -168,6 +176,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-product-features-widget.php' );
 		require_once( __DIR__. '/widgets/class-announcement-bar-widget.php' );
 		require_once( __DIR__. '/widgets/class-hero-section-widget.php' );
+		require_once( __DIR__. '/widgets/class-sizing-guide-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -178,6 +187,7 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Product_Features_Widget() );
 		$widgets_manager->register( new Widgets\Announcement_Bar_Widget() );
 		$widgets_manager->register( new Widgets\Hero_Section_Widget() );
+		$widgets_manager->register( new Widgets\Sizing_Guide_Widget() );
 	}
 
     /**
