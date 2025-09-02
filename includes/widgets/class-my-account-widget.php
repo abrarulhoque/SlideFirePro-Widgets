@@ -337,22 +337,46 @@ class My_Account_Widget extends Widget_Base {
 		$this->end_controls_section();
 	}
 
-	protected function render(): void {
-		if ( ! class_exists( 'WooCommerce' ) ) {
-			echo '<div class="slidefirePro-no-woocommerce">' . esc_html__( 'WooCommerce is not active.', 'slidefirePro-widgets' ) . '</div>';
-			return;
-		}
+    protected function render(): void {
+        if ( ! class_exists( 'WooCommerce' ) ) {
+            echo '<div class="slidefirePro-no-woocommerce">' . esc_html__( 'WooCommerce is not active.', 'slidefirePro-widgets' ) . '</div>';
+            return;
+        }
 
-		if ( ! is_user_logged_in() ) {
-			echo '<div class="my-account-login-prompt">';
-			echo '<p>' . esc_html__( 'Please log in to access your account dashboard.', 'slidefirePro-widgets' ) . '</p>';
-			wc_get_template( 'myaccount/form-login.php' );
-			echo '</div>';
-			return;
-		}
+        if ( ! is_user_logged_in() ) {
+            echo '<div class="my-account-login-prompt">';
+            echo '<p>' . esc_html__( 'Please log in to access your account dashboard.', 'slidefirePro-widgets' ) . '</p>';
+            wc_get_template( 'myaccount/form-login.php' );
+            echo '</div>';
+            return;
+        }
 
-		$settings = $this->get_settings_for_display();
-		$current_user = wp_get_current_user();
+        $settings      = $this->get_settings_for_display();
+        $current_user  = wp_get_current_user();
+        $my_account_url = wc_get_page_permalink( 'myaccount' );
+
+        // Detect current WooCommerce endpoint to keep the widget in sync with Woo flows
+        $current_endpoint = 'dashboard';
+        if ( function_exists( 'is_wc_endpoint_url' ) ) {
+            foreach ( [ 'orders', 'view-order', 'downloads', 'edit-address', 'edit-account', 'payment-methods', 'add-payment-method' ] as $ep ) {
+                if ( is_wc_endpoint_url( $ep ) ) {
+                    $current_endpoint = $ep;
+                    break;
+                }
+            }
+        }
+
+        // Map endpoints to local tab keys used in the UI
+        $endpoint_to_tab = [
+            'dashboard'        => 'profile',
+            'edit-account'     => 'profile',
+            'orders'           => 'orders',
+            'view-order'       => 'orders',
+            'edit-address'     => 'addresses',
+            'payment-methods'  => 'payments',
+            'add-payment-method' => 'payments',
+        ];
+        $active_tab = isset( $endpoint_to_tab[ $current_endpoint ] ) ? $endpoint_to_tab[ $current_endpoint ] : 'profile';
 		?>
 		
 		<section class="my-account-wrapper bg-background min-h-screen py-20">
@@ -381,87 +405,101 @@ class My_Account_Widget extends Widget_Base {
 
 				<div class="my-account-tabs-wrapper">
 					<!-- Tab Navigation -->
-					<div class="my-account-tabs grid grid-cols-4 lg:grid-cols-6 gap-0 bg-card border border-border rounded-lg mb-8 overflow-hidden">
-						<?php if ( 'yes' === $settings['show_profile_tab'] ) : ?>
-						<button class="tab-trigger active bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="profile">
-							<?php esc_html_e( 'Profile', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ( 'yes' === $settings['show_orders_tab'] ) : ?>
-						<button class="tab-trigger bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="orders">
-							<?php esc_html_e( 'Orders', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ( 'yes' === $settings['show_addresses_tab'] ) : ?>
-						<button class="tab-trigger bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="addresses">
-							<?php esc_html_e( 'Addresses', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ( 'yes' === $settings['show_payments_tab'] ) : ?>
-						<button class="tab-trigger bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="payments">
-							<?php esc_html_e( 'Payment', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ( 'yes' === $settings['show_notifications_tab'] ) : ?>
-						<button class="tab-trigger bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="notifications">
-							<?php esc_html_e( 'Notifications', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-						
-						<?php if ( 'yes' === $settings['show_security_tab'] ) : ?>
-						<button class="tab-trigger bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="security">
-							<?php esc_html_e( 'Security', 'slidefirePro-widgets' ); ?>
-						</button>
-						<?php endif; ?>
-					</div>
+                    <div class="my-account-tabs grid grid-cols-4 lg:grid-cols-6 gap-0 bg-card border border-border rounded-lg mb-8 overflow-hidden">
+                        <?php if ( 'yes' === $settings['show_profile_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'profile' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="profile" href="<?php echo esc_url( wc_get_endpoint_url( 'edit-account', '', $my_account_url ) ); ?>">
+                            <?php esc_html_e( 'Profile', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( 'yes' === $settings['show_orders_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'orders' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="orders" href="<?php echo esc_url( wc_get_endpoint_url( 'orders', '', $my_account_url ) ); ?>">
+                            <?php esc_html_e( 'Orders', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( 'yes' === $settings['show_addresses_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'addresses' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="addresses" href="<?php echo esc_url( wc_get_endpoint_url( 'edit-address', '', $my_account_url ) ); ?>">
+                            <?php esc_html_e( 'Addresses', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( 'yes' === $settings['show_payments_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'payments' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="payments" href="<?php echo esc_url( wc_get_endpoint_url( 'payment-methods', '', $my_account_url ) ); ?>">
+                            <?php esc_html_e( 'Payment', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( 'yes' === $settings['show_notifications_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'notifications' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="notifications" href="#notifications">
+                            <?php esc_html_e( 'Notifications', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                        
+                        <?php if ( 'yes' === $settings['show_security_tab'] ) : ?>
+                        <a class="tab-trigger <?php echo ( 'security' === $active_tab ) ? 'active' : ''; ?> bg-transparent border-0 p-4 text-center cursor-pointer transition-all duration-200 hover:bg-muted" data-tab="security" href="#security">
+                            <?php esc_html_e( 'Security', 'slidefirePro-widgets' ); ?>
+                        </a>
+                        <?php endif; ?>
+                    </div>
 
 					<!-- Tab Content -->
 					<div class="tab-content-wrapper space-y-8">
 						
-						<?php if ( 'yes' === $settings['show_profile_tab'] ) : ?>
-						<!-- Profile Tab -->
-						<div class="tab-content active" id="tab-profile">
-							<?php $this->render_profile_tab( $current_user ); ?>
-						</div>
-						<?php endif; ?>
+                        <?php if ( 'yes' === $settings['show_profile_tab'] ) : ?>
+                        <!-- Profile / Account Details Tab -->
+                        <div class="tab-content <?php echo ( 'profile' === $active_tab ) ? 'active' : ''; ?>" id="tab-profile">
+                            <?php $this->render_profile_tab( $current_user ); ?>
+                        </div>
+                        <?php endif; ?>
 						
 						<?php if ( 'yes' === $settings['show_orders_tab'] ) : ?>
 						<!-- Orders Tab -->
-						<div class="tab-content" id="tab-orders">
-							<?php $this->render_orders_tab(); ?>
-						</div>
+                        <div class="tab-content <?php echo ( 'orders' === $active_tab ) ? 'active' : ''; ?>" id="tab-orders">
+                            <?php $this->render_orders_tab(); ?>
+                        </div>
 						<?php endif; ?>
 						
 						<?php if ( 'yes' === $settings['show_addresses_tab'] ) : ?>
 						<!-- Addresses Tab -->
-						<div class="tab-content" id="tab-addresses">
-							<?php $this->render_addresses_tab(); ?>
-						</div>
+                        <div class="tab-content <?php echo ( 'addresses' === $active_tab ) ? 'active' : ''; ?>" id="tab-addresses">
+                            <?php $this->render_addresses_tab(); ?>
+                        </div>
 						<?php endif; ?>
 						
 						<?php if ( 'yes' === $settings['show_payments_tab'] ) : ?>
 						<!-- Payment Methods Tab -->
-						<div class="tab-content" id="tab-payments">
-							<?php $this->render_payments_tab(); ?>
-						</div>
+                        <div class="tab-content <?php echo ( 'payments' === $active_tab ) ? 'active' : ''; ?>" id="tab-payments">
+                            <?php $this->render_payments_tab(); ?>
+                        </div>
 						<?php endif; ?>
 						
 						<?php if ( 'yes' === $settings['show_notifications_tab'] ) : ?>
 						<!-- Notifications Tab -->
-						<div class="tab-content" id="tab-notifications">
-							<?php $this->render_notifications_tab(); ?>
-						</div>
+                        <div class="tab-content <?php echo ( 'notifications' === $active_tab ) ? 'active' : ''; ?>" id="tab-notifications">
+                            <?php $this->render_notifications_tab(); ?>
+                        </div>
 						<?php endif; ?>
 						
 						<?php if ( 'yes' === $settings['show_security_tab'] ) : ?>
 						<!-- Security Tab -->
-						<div class="tab-content" id="tab-security">
-							<?php $this->render_security_tab(); ?>
-						</div>
+                        <div class="tab-content <?php echo ( 'security' === $active_tab ) ? 'active' : ''; ?>" id="tab-security">
+                            <?php $this->render_security_tab(); ?>
+                        </div>
+                        
+                        <?php
+                        // Handle special Woo endpoints without explicit tabs (e.g., downloads)
+                        if ( in_array( $current_endpoint, [ 'downloads' ], true ) ) : ?>
+                            <div class="tab-content active" id="tab-generic">
+                                <div class="my-account-card p-6 bg-card border border-border rounded-lg">
+                                    <?php
+                                    if ( 'downloads' === $current_endpoint ) {
+                                        wc_get_template( 'myaccount/downloads.php' );
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 						<?php endif; ?>
 					</div>
 				</div>
@@ -542,11 +580,11 @@ class My_Account_Widget extends Widget_Base {
 	/**
 	 * Render Orders Tab
 	 */
-	private function render_orders_tab(): void {
-		?>
-		<div class="orders-header flex items-center justify-between mb-6">
-			<h2 class="text-2xl font-bold"><?php esc_html_e( 'Order History', 'slidefirePro-widgets' ); ?></h2>
-			<div class="flex space-x-2">
+    private function render_orders_tab(): void {
+        ?>
+        <div class="orders-header flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold"><?php esc_html_e( 'Order History', 'slidefirePro-widgets' ); ?></h2>
+            <div class="flex space-x-2">
 				<button class="filter-btn inline-flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-md hover:bg-muted transition-colors">
 					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -560,56 +598,79 @@ class My_Account_Widget extends Widget_Base {
 					<?php esc_html_e( 'Filter by Status', 'slidefirePro-widgets' ); ?>
 				</button>
 			</div>
-		</div>
+        </div>
 
-		<div class="orders-list space-y-4">
-			<?php wc_get_template( 'myaccount/orders.php' ); ?>
-		</div>
-		<?php
-	}
+        <div class="orders-list space-y-4">
+            <?php
+            // If viewing a specific order, render that endpoint content
+            if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'view-order' ) ) {
+                $order_id = absint( get_query_var( 'view-order' ) );
+                do_action( 'woocommerce_account_view-order_endpoint', $order_id );
+            } else {
+                wc_get_template( 'myaccount/orders.php' );
+            }
+            ?>
+        </div>
+        <?php
+    }
 
 	/**
 	 * Render Addresses Tab
 	 */
-	private function render_addresses_tab(): void {
-		?>
-		<div class="addresses-header flex items-center justify-between mb-6">
-			<h2 class="text-2xl font-bold"><?php esc_html_e( 'Saved Addresses', 'slidefirePro-widgets' ); ?></h2>
-			<button class="add-address-btn inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+    private function render_addresses_tab(): void {
+        ?>
+        <div class="addresses-header flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold"><?php esc_html_e( 'Saved Addresses', 'slidefirePro-widgets' ); ?></h2>
+            <button class="add-address-btn inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
 				</svg>
 				<?php esc_html_e( 'Add New Address', 'slidefirePro-widgets' ); ?>
 			</button>
-		</div>
+        </div>
 
-		<div class="addresses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
-			<?php wc_get_template( 'myaccount/my-address.php' ); ?>
-		</div>
-		<?php
-	}
+        <div class="addresses-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+            <?php
+            // If editing a specific address (billing/shipping), render the edit form endpoint
+            if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'edit-address' ) && get_query_var( 'edit-address' ) ) {
+                $address_type = sanitize_text_field( get_query_var( 'edit-address' ) );
+                do_action( 'woocommerce_account_edit-address_endpoint', $address_type );
+            } else {
+                wc_get_template( 'myaccount/my-address.php' );
+            }
+            ?>
+        </div>
+        <?php
+    }
 
 	/**
 	 * Render Payment Methods Tab
 	 */
-	private function render_payments_tab(): void {
-		?>
-		<div class="payments-header flex items-center justify-between mb-6">
-			<h2 class="text-2xl font-bold"><?php esc_html_e( 'Payment Methods', 'slidefirePro-widgets' ); ?></h2>
-			<button class="add-payment-btn inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+    private function render_payments_tab(): void {
+        ?>
+        <div class="payments-header flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold"><?php esc_html_e( 'Payment Methods', 'slidefirePro-widgets' ); ?></h2>
+            <button class="add-payment-btn inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
 				</svg>
 				<?php esc_html_e( 'Add Payment Method', 'slidefirePro-widgets' ); ?>
 			</button>
-		</div>
+        </div>
 
-		<div class="payments-grid grid grid-cols-1 md:grid-cols-2 gap-6">
-			<?php wc_get_template( 'myaccount/payment-methods.php' ); ?>
-		</div>
-		<?php
-	}
+        <div class="payments-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+            <?php
+            // If adding a payment method, render the endpoint content
+            if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'add-payment-method' ) ) {
+                do_action( 'woocommerce_account_add-payment-method_endpoint' );
+            } else {
+                wc_get_template( 'myaccount/payment-methods.php' );
+            }
+            ?>
+        </div>
+        <?php
+    }
 
 	/**
 	 * Render Notifications Tab

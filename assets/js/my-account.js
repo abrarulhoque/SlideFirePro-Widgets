@@ -14,23 +14,27 @@
         init() {
             this.bindEvents();
             this.initTabs();
-            this.initProfileEdit();
             this.initFormValidation();
         }
 
         bindEvents() {
             $(document).ready(() => {
                 this.setupTabNavigation();
-                this.setupEditingStates();
                 this.setupNotifications();
             });
         }
 
         setupTabNavigation() {
             $('.my-account-tabs .tab-trigger').on('click', (e) => {
-                e.preventDefault();
-                const targetTab = $(e.currentTarget).data('tab');
-                this.switchTab(targetTab);
+                const $target = $(e.currentTarget);
+                const href = $target.attr('href') || '';
+                const targetTab = $target.data('tab');
+
+                // Only intercept in-page tab switches (anchors starting with #).
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    this.switchTab(targetTab);
+                }
             });
 
             // Handle URL hash for direct tab access
@@ -79,77 +83,7 @@
             });
         }
 
-        initProfileEdit() {
-            let isEditing = false;
-
-            $('.profile-edit-btn').on('click', (e) => {
-                e.preventDefault();
-                this.toggleEditMode(!isEditing);
-                isEditing = !isEditing;
-            });
-        }
-
-        toggleEditMode(enable) {
-            const $form = $('.my-account-wrapper form');
-            const $inputs = $form.find('input, select, textarea');
-            const $editBtn = $('.profile-edit-btn');
-
-            if (enable) {
-                $inputs.prop('disabled', false).removeClass('disabled');
-                $editBtn.html(`
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Cancel
-                `);
-                
-                // Show save button
-                this.showSaveButton();
-            } else {
-                $inputs.prop('disabled', true).addClass('disabled');
-                $editBtn.html(`
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    Edit
-                `);
-                
-                // Hide save button
-                this.hideSaveButton();
-            }
-        }
-
-        showSaveButton() {
-            if (!$('.profile-save-actions').length) {
-                const saveHtml = `
-                    <div class="profile-save-actions flex justify-end space-x-4 mt-8 pt-6 border-t border-border">
-                        <button type="button" class="profile-cancel-btn inline-flex items-center px-4 py-2 border border-border text-foreground rounded-md hover:bg-muted transition-colors">
-                            Cancel
-                        </button>
-                        <button type="submit" class="profile-save-btn inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-                            Save Changes
-                        </button>
-                    </div>
-                `;
-                $('.my-account-card').append(saveHtml);
-                
-                $('.profile-cancel-btn').on('click', () => {
-                    this.toggleEditMode(false);
-                });
-            }
-        }
-
-        hideSaveButton() {
-            $('.profile-save-actions').remove();
-        }
-
-        setupEditingStates() {
-            // Initially disable all form inputs
-            $('.my-account-wrapper form input, .my-account-wrapper form select, .my-account-wrapper form textarea')
-                .not('[type="submit"]')
-                .prop('disabled', true)
-                .addClass('disabled');
-        }
+        // Removed manual input disable/enable to allow WooCommerce forms to work as expected
 
         setupNotifications() {
             // Handle notification preference toggles
