@@ -1,0 +1,659 @@
+/**
+ * SlideFirePro My Account Widget CSS
+ * Based on the MyAccount.tsx component design
+ */
+
+/* CSS Custom Properties - matching the design system */
+.slidefirePro-my-account {
+    --slidefire-background: #000000;
+    --slidefire-foreground: #ffffff;
+    --slidefire-card: #111111;
+    --slidefire-card-foreground: #ffffff;
+    --slidefire-primary: #23B2EE;
+    --slidefire-primary-foreground: #000000;
+    --slidefire-secondary: #1a1a1a;
+    --slidefire-secondary-foreground: #ffffff;
+    --slidefire-muted: #222222;
+    --slidefire-muted-foreground: #888888;
+    --slidefire-accent: #23B2EE;
+    --slidefire-accent-foreground: #000000;
+    --slidefire-border: #333333;
+    --slidefire-input: #1a1a1a;
+    --slidefire-input-background: #1a1a1a;
+}
+
+/* Main wrapper styling */
+.my-account-wrapper {
+    background-color: var(--slidefire-background);
+    color: var(--slidefire-foreground);
+    min-height: 100vh;
+    padding: 5rem 0;
+}
+
+/* Container */
+.my-account-wrapper .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Header styling */
+.my-account-header {
+    margin-bottom: 3rem;
+}
+
+.my-account-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--slidefire-foreground);
+}
+
+.my-account-header .title-gradient {
+    background: linear-gradient(to right, var(--slidefire-primary), #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+.my-account-header .subtitle {
+    font-size: 1.25rem;
+    color: var(--slidefire-muted-foreground);
+}
+
+/* Tab navigation styling */
+.my-account-tabs-wrapper {
+    margin-bottom: 2rem;
+}
+
+.my-account-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .my-account-tabs {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.my-account-tabs .tab-trigger {
+    background: transparent;
+    border: none;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--slidefire-foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.my-account-tabs .tab-trigger:hover {
+    background-color: var(--slidefire-muted);
+}
+
+.my-account-tabs .tab-trigger.active {
+    background-color: var(--slidefire-card);
+    color: var(--slidefire-primary);
+}
+
+.my-account-tabs .tab-trigger.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--slidefire-primary);
+}
+
+/* Tab content */
+.tab-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Card styling */
+.my-account-card {
+    padding: 2rem;
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+}
+
+/* Profile section */
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.profile-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slidefire-foreground);
+    margin: 0;
+}
+
+.profile-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--slidefire-primary);
+    color: var(--slidefire-primary);
+    border-radius: 0.375rem;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.profile-edit-btn:hover {
+    background-color: rgba(35, 178, 238, 0.1);
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-avatar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar > div:first-child {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: rgba(35, 178, 238, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar svg {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--slidefire-primary);
+}
+
+.profile-avatar h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--slidefire-foreground);
+    margin: 0 0 0.25rem 0;
+}
+
+.profile-avatar p {
+    color: var(--slidefire-muted-foreground);
+    margin: 0 0 0.5rem 0;
+}
+
+.profile-avatar span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    border: 1px solid var(--slidefire-primary);
+    color: var(--slidefire-primary);
+    border-radius: 1rem;
+    background: transparent;
+}
+
+/* Stats cards */
+.profile-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-stats h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--slidefire-foreground);
+}
+
+.profile-stats .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    padding: 1rem;
+    background-color: var(--slidefire-muted);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.stat-card > div:first-child {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slidefire-primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-card > div:last-child {
+    font-size: 0.75rem;
+    color: var(--slidefire-muted-foreground);
+}
+
+/* Orders section */
+.orders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.orders-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slidefire-foreground);
+    margin: 0;
+}
+
+.orders-header .flex {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--slidefire-foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: var(--slidefire-muted);
+}
+
+.filter-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Addresses section */
+.addresses-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.addresses-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slidefire-foreground);
+    margin: 0;
+}
+
+.add-address-btn,
+.add-payment-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--slidefire-primary);
+    color: var(--slidefire-primary-foreground);
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-address-btn:hover,
+.add-payment-btn:hover {
+    background-color: rgba(35, 178, 238, 0.9);
+}
+
+.add-address-btn svg,
+.add-payment-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.addresses-grid,
+.payments-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .addresses-grid,
+    .payments-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Payments section */
+.payments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.payments-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slidefire-foreground);
+    margin: 0;
+}
+
+/* Notifications section */
+.notification-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+}
+
+.notification-item > div:first-child {
+    flex: 1;
+}
+
+.notification-item .font-medium {
+    font-weight: 500;
+    color: var(--slidefire-foreground);
+    margin-bottom: 0.25rem;
+}
+
+.notification-item .text-sm {
+    font-size: 0.875rem;
+    color: var(--slidefire-muted-foreground);
+}
+
+.notification-item span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 1rem;
+}
+
+.notification-item span.bg-green-500 {
+    background-color: #10b981;
+    color: white;
+}
+
+/* Security section */
+.my-account-card h3 {
+    font-weight: 600;
+    color: var(--slidefire-foreground);
+    margin: 0;
+}
+
+.my-account-card .flex.items-center {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.my-account-card svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.my-account-card p {
+    font-size: 0.875rem;
+    color: var(--slidefire-muted-foreground);
+    margin-bottom: 1rem;
+}
+
+.my-account-card button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 0.875rem;
+}
+
+.my-account-card button.border {
+    border: 1px solid var(--slidefire-primary);
+    color: var(--slidefire-primary);
+    background: transparent;
+}
+
+.my-account-card button.border:hover {
+    background-color: rgba(35, 178, 238, 0.1);
+}
+
+.my-account-card button.bg-primary {
+    background-color: var(--slidefire-primary);
+    color: var(--slidefire-primary-foreground);
+}
+
+.my-account-card button.bg-primary:hover {
+    background-color: rgba(35, 178, 238, 0.9);
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+    .my-account-header h1 {
+        font-size: 3rem;
+    }
+    
+    .grid.grid-cols-1.md\\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .my-account-header h1 {
+        font-size: 3.5rem;
+    }
+}
+
+/* Login prompt styling */
+.my-account-login-prompt {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    margin: 2rem 0;
+}
+
+.my-account-login-prompt p {
+    color: var(--slidefire-muted-foreground);
+    margin-bottom: 1.5rem;
+}
+
+/* WooCommerce integration styles */
+.slidefirePro-no-woocommerce {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    color: var(--slidefire-muted-foreground);
+}
+
+/* Override WooCommerce default styles */
+.my-account-wrapper .woocommerce-MyAccount-navigation {
+    display: none;
+}
+
+.my-account-wrapper .woocommerce-MyAccount-content {
+    width: 100%;
+    margin: 0;
+}
+
+.my-account-wrapper .woocommerce form {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.my-account-wrapper .woocommerce .form-row {
+    margin-bottom: 1rem;
+}
+
+.my-account-wrapper .woocommerce label {
+    color: var(--slidefire-foreground);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.my-account-wrapper .woocommerce input[type="text"],
+.my-account-wrapper .woocommerce input[type="email"],
+.my-account-wrapper .woocommerce input[type="password"],
+.my-account-wrapper .woocommerce select,
+.my-account-wrapper .woocommerce textarea {
+    background-color: var(--slidefire-input-background);
+    border: 1px solid var(--slidefire-border);
+    color: var(--slidefire-foreground);
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+.my-account-wrapper .woocommerce input[type="text"]:focus,
+.my-account-wrapper .woocommerce input[type="email"]:focus,
+.my-account-wrapper .woocommerce input[type="password"]:focus,
+.my-account-wrapper .woocommerce select:focus,
+.my-account-wrapper .woocommerce textarea:focus {
+    border-color: var(--slidefire-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(35, 178, 238, 0.1);
+}
+
+.my-account-wrapper .woocommerce .button,
+.my-account-wrapper .woocommerce button {
+    background-color: var(--slidefire-primary);
+    color: var(--slidefire-primary-foreground);
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.my-account-wrapper .woocommerce .button:hover,
+.my-account-wrapper .woocommerce button:hover {
+    background-color: rgba(35, 178, 238, 0.9);
+}
+
+/* Orders table styling */
+.my-account-wrapper .woocommerce-orders-table {
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.my-account-wrapper .woocommerce-orders-table th,
+.my-account-wrapper .woocommerce-orders-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--slidefire-border);
+    color: var(--slidefire-foreground);
+}
+
+.my-account-wrapper .woocommerce-orders-table th {
+    background-color: var(--slidefire-muted);
+    font-weight: 600;
+}
+
+.my-account-wrapper .woocommerce-orders-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Address cards styling */
+.my-account-wrapper .woocommerce-Address {
+    background-color: var(--slidefire-card);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+}
+
+.my-account-wrapper .woocommerce-Address address {
+    color: var(--slidefire-foreground);
+    font-style: normal;
+    line-height: 1.5;
+}
+
+.my-account-wrapper .woocommerce-Address .edit {
+    background-color: var(--slidefire-primary);
+    color: var(--slidefire-primary-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1rem;
+    transition: all 0.2s ease;
+}
+
+.my-account-wrapper .woocommerce-Address .edit:hover {
+    background-color: rgba(35, 178, 238, 0.9);
+}
+
+/* Error and success messages */
+.my-account-wrapper .woocommerce-error,
+.my-account-wrapper .woocommerce-message,
+.my-account-wrapper .woocommerce-info {
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.my-account-wrapper .woocommerce-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.my-account-wrapper .woocommerce-message {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.my-account-wrapper .woocommerce-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
