@@ -207,7 +207,8 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Hero_Section_Widget() );
 		$widgets_manager->register( new Widgets\Sizing_Guide_Widget() );
 		$widgets_manager->register( new Widgets\Shipping_Page_Widget() );
-		$widgets_manager->register( new SlideFirePro_Returns_Policy_Widget() );
+			// Returns Policy widget is defined in the global namespace.
+			$widgets_manager->register( new \SlideFirePro_Returns_Policy_Widget() );
 	}
 
     /**
