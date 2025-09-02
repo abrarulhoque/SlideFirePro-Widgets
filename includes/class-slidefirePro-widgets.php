@@ -158,6 +158,14 @@ class SlideFirePro_Widgets {
             [],
             '1.22.0'
         );
+
+        // Register returns policy assets
+        wp_register_style(
+            'slidefire-returns-policy-widget',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/returns-policy-widget.css',
+            [],
+            '1.23.0'
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -186,6 +194,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-hero-section-widget.php' );
 		require_once( __DIR__. '/widgets/class-sizing-guide-widget.php' );
 		require_once( __DIR__. '/widgets/class-shipping-page-widget.php' );
+		require_once( __DIR__. '/../widgets/class-returns-policy-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -198,6 +207,7 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Hero_Section_Widget() );
 		$widgets_manager->register( new Widgets\Sizing_Guide_Widget() );
 		$widgets_manager->register( new Widgets\Shipping_Page_Widget() );
+		$widgets_manager->register( new SlideFirePro_Returns_Policy_Widget() );
 	}
 
     /**
