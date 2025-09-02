@@ -210,6 +210,8 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-hero-section-widget.php' );
 		require_once( __DIR__. '/widgets/class-sizing-guide-widget.php' );
 		require_once( __DIR__. '/widgets/class-shipping-page-widget.php' );
+		// Newly added My Account widget
+		require_once( __DIR__. '/widgets/class-my-account-widget.php' );
 		require_once( __DIR__. '/../widgets/class-returns-policy-widget.php' );
 
 		// Register the widget classes.
