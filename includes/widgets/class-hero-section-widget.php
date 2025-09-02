@@ -630,12 +630,11 @@ class Hero_Section_Widget extends Widget_Base {
 									// Duplicate the items for infinite scroll effect
 									$teams_items = array_merge( $settings['teams_list'], $settings['teams_list'] );
 									foreach ( $teams_items as $index => $item ) : ?>
-									<div class="team-card">
+									<div class="team-card" style="--team-icon-color: <?php echo esc_attr( $item['icon_color'] ); ?>;">
 										<?php if ( $item['team_icon']['value'] ) : ?>
-											<?php Icons_Manager::render_icon( $item['team_icon'], [ 
-												'aria-hidden' => 'true',
-												'style' => 'color: ' . esc_attr( $item['icon_color'] ) . ';'
-											] ); ?>
+											<span class="team-icon" aria-hidden="true">
+												<?php Icons_Manager::render_icon( $item['team_icon'], [ 'aria-hidden' => 'true' ] ); ?>
+											</span>
 										<?php endif; ?>
 									</div>
 									<?php endforeach; ?>

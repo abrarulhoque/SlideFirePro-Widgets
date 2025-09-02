@@ -140,7 +140,7 @@ class SlideFirePro_Widgets {
             'slidefirePro-hero-section',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/hero-section.css',
             [],
-            '1.21.0'
+            '1.21.1'
         );
 		
 		// Localize script for AJAX

@@ -482,7 +482,7 @@
 /* Teams Section */
 .teams-section {
 	text-align: center;
-	display: none;
+	display: block;
 }
 
 .teams-title {
@@ -526,11 +526,16 @@
 
 .team-card svg,
 .team-card i {
-	width: 2rem;
-	height: 2rem;
-	opacity: 0.7;
-	transition: opacity 0.3s ease;
+    width: 2rem;
+    height: 2rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    color: var(--team-icon-color, var(--slidefire-primary));
 }
+
+/* Ensure SVG icons follow the color variable on frontend */
+.team-card svg { fill: currentColor; stroke: currentColor; }
+.team-card svg * { fill: currentColor; stroke: currentColor; }
 
 .team-card:hover svg,
 .team-card:hover i {
