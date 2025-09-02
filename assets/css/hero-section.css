@@ -1,6 +1,6 @@
 /**
  * Hero Section Widget Styles
- * Version: 1.2.0
+ * Version: 1.21.0
  */
 
 /* CSS Variables */
@@ -106,7 +106,7 @@
 /* Hero Section */
 .hero-section {
 	position: relative;
-	min-height: 65vh;
+	min-height: 100vh;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -324,20 +324,23 @@
 }
 
 .hero-content {
-	max-width: 32rem;
-	padding-top: 2rem;
+	max-width: 100%;
+	padding: 2rem 1rem;
+	text-align: center;
 }
 
 /* Badge */
 .hero-badge {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.5rem;
 	margin-bottom: 1.5rem;
 	color: var(--slidefire-primary);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	font-weight: 500;
+	font-size: 0.75rem;
 }
 
 .hero-badge svg,
@@ -349,7 +352,7 @@
 
 /* Title */
 .hero-title {
-	font-size: 3rem;
+	font-size: 2.5rem;
 	margin-bottom: 1.5rem;
 	line-height: 1.2;
 	font-weight: 700;
@@ -358,7 +361,7 @@
 
 /* Description */
 .hero-description {
-	font-size: 1.25rem;
+	font-size: 1rem;
 	color: var(--slidefire-muted-foreground);
 	margin-bottom: 2rem;
 	line-height: 1.6;
@@ -377,7 +380,7 @@
 	border-radius: 1rem;
 	padding: 1.5rem;
 	aspect-ratio: 1;
-	max-width: 24rem;
+	max-width: 20rem;
 	margin: 0 auto;
 	backdrop-filter: blur(4px);
 }
@@ -478,11 +481,12 @@
 
 /* Teams Section */
 .teams-section {
-	text-align: left;
+	text-align: center;
+	display: none;
 }
 
 .teams-title {
-	font-size: 2rem;
+	font-size: 1.5rem;
 	margin-bottom: 1.5rem;
 	font-weight: 700;
 	background: linear-gradient(to right, var(--slidefire-primary), #60a5fa);
@@ -576,22 +580,64 @@
 @media (min-width: 640px) {
 	.hero-buttons {
 		flex-direction: row;
+		justify-content: center;
+		gap: 1rem;
+	}
+	
+	.hero-btn {
+		flex: 1;
+		max-width: 200px;
 	}
 }
 
 @media (min-width: 768px) {
+	.hero-section {
+		min-height: 80vh;
+	}
+	
+	.hero-content {
+		text-align: left;
+		padding: 2rem 0;
+	}
+	
+	.hero-badge {
+		justify-content: flex-start;
+		font-size: 0.875rem;
+	}
+	
 	.hero-title {
 		font-size: 4rem;
+	}
+	
+	.hero-description {
+		font-size: 1.25rem;
+	}
+	
+	.teams-section {
+		text-align: left;
+		display: block;
 	}
 	
 	.teams-title {
 		font-size: 2.5rem;
 	}
+	
+	.hero-buttons {
+		justify-content: flex-start;
+	}
 }
 
 @media (min-width: 1024px) {
+	.hero-section {
+		min-height: 65vh;
+	}
+	
 	.hero-grid {
 		grid-template-columns: 1fr 1fr;
+	}
+	
+	.hero-content {
+		max-width: 32rem;
 	}
 	
 	.hero-title {
