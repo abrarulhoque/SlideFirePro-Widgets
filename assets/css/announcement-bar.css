@@ -1,0 +1,185 @@
+/* SlideFirePro Announcement Bar Widget Styles */
+.slidefire-announcement-bar {
+    position: relative;
+    background: linear-gradient(to right, #0f172a, #111827);
+    color: var(--primary, #23B2EE);
+    padding: 8px 16px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(35, 178, 238, 0.2);
+    z-index: 1;
+}
+
+/* Animated background */
+.slidefire-announcement-bar.has-pulse-bg .animated-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(15, 23, 42, 0.6), rgba(17, 24, 39, 0.6), rgba(15, 23, 42, 0.6));
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    z-index: -1;
+}
+
+/* Content wrapper */
+.slidefire-announcement-bar .announcement-content-wrapper {
+    position: relative;
+    z-index: 2;
+}
+
+/* Content styling */
+.slidefire-announcement-bar .announcement-content {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.5;
+}
+
+/* Highlighted text */
+.slidefire-announcement-bar .highlight-text {
+    font-weight: 700;
+    color: var(--primary, #23B2EE);
+}
+
+/* Sparkle effects */
+.slidefire-announcement-bar .sparkle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: var(--primary, #23B2EE);
+    z-index: 1;
+}
+
+.slidefire-announcement-bar .sparkle-1 {
+    top: 4px;
+    left: 16px;
+    width: 4px;
+    height: 4px;
+    opacity: 0.6;
+}
+
+.slidefire-announcement-bar .sparkle-2 {
+    top: 4px;
+    right: 32px;
+    width: 2px;
+    height: 2px;
+    opacity: 0.4;
+}
+
+.slidefire-announcement-bar .sparkle-3 {
+    bottom: 4px;
+    left: 64px;
+    width: 2px;
+    height: 2px;
+    opacity: 0.5;
+}
+
+.slidefire-announcement-bar .sparkle-4 {
+    bottom: 4px;
+    right: 16px;
+    width: 4px;
+    height: 4px;
+    opacity: 0.3;
+}
+
+/* Animation classes */
+.sparkle-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.sparkle-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.sparkle-bounce {
+    animation: bounce 1s infinite;
+}
+
+/* Keyframes */
+@keyframes ping {
+    75%, 100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        transform: translateY(-25%);
+    }
+    50% {
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        transform: none;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .slidefire-announcement-bar {
+        padding: 6px 12px;
+    }
+    
+    .slidefire-announcement-bar .announcement-content {
+        font-size: 13px;
+    }
+    
+    /* Adjust sparkle positions for mobile */
+    .slidefire-announcement-bar .sparkle-1 {
+        left: 8px;
+    }
+    
+    .slidefire-announcement-bar .sparkle-2 {
+        right: 16px;
+    }
+    
+    .slidefire-announcement-bar .sparkle-3 {
+        left: 32px;
+    }
+    
+    .slidefire-announcement-bar .sparkle-4 {
+        right: 8px;
+    }
+}
+
+/* Additional gradient variants */
+.slidefire-announcement-bar.gradient-blue {
+    background: linear-gradient(to right, #1e40af, #3b82f6);
+}
+
+.slidefire-announcement-bar.gradient-purple {
+    background: linear-gradient(to right, #7c3aed, #a855f7);
+}
+
+.slidefire-announcement-bar.gradient-green {
+    background: linear-gradient(to right, #059669, #10b981);
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+    .slidefire-announcement-bar {
+        background: linear-gradient(to right, #0f172a, #111827);
+    }
+    
+    .slidefire-announcement-bar.has-pulse-bg .animated-bg {
+        background: linear-gradient(to right, rgba(15, 23, 42, 0.8), rgba(17, 24, 39, 0.8), rgba(15, 23, 42, 0.8));
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .slidefire-announcement-bar {
+        border-bottom-width: 2px;
+    }
+    
+    .slidefire-announcement-bar .highlight-text {
+        text-decoration: underline;
+    }
+}

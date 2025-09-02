@@ -126,6 +126,14 @@ class SlideFirePro_Widgets {
             '1.16.0',
             true
         );
+
+        // Register announcement bar assets
+        wp_register_style(
+            'slidefirePro-announcement-bar',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/announcement-bar.css',
+            [],
+            '1.17.0'
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -150,6 +158,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-header-navigation-widget.php' );
 		require_once( __DIR__. '/widgets/class-product-customizer-widget.php' );
 		require_once( __DIR__. '/widgets/class-product-features-widget.php' );
+		require_once( __DIR__. '/widgets/class-announcement-bar-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -158,6 +167,7 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Header_Navigation_Widget() );
 		$widgets_manager->register( new Widgets\Product_Customizer_Widget() );
 		$widgets_manager->register( new Widgets\Product_Features_Widget() );
+		$widgets_manager->register( new Widgets\Announcement_Bar_Widget() );
 	}
 
     /**
