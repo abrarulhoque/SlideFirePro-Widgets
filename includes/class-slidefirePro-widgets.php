@@ -204,14 +204,30 @@ class SlideFirePro_Widgets {
             'slidefire-cart-drawer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/cart-drawer.css',
             [],
-            '1.26.0'
+            '1.27.0'
         );
 
         wp_register_script(
             'slidefire-cart-drawer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/cart-drawer.js',
             [ 'jquery', 'elementor-frontend' ],
-            '1.26.0',
+            '1.27.0',
+            true
+        );
+
+        // Register contact page assets
+        wp_register_style(
+            'slidefire-contact-page-widget',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/contact-page-widget.css',
+            [],
+            '1.27.0'
+        );
+
+        wp_register_script(
+            'slidefire-contact-page-widget',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/js/contact-page-widget.js',
+            [ 'jquery', 'elementor-frontend' ],
+            '1.27.0',
             true
         );
 		
@@ -248,6 +264,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-checkout-widget.php' );
 		require_once( __DIR__. '/../widgets/class-returns-policy-widget.php' );
 		require_once( __DIR__. '/widgets/class-cart-drawer-widget.php' );
+		require_once( __DIR__. '/../widgets/class-contact-page-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -265,6 +282,8 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Cart_Drawer_Widget() );
 			// Returns Policy widget is defined in the global namespace.
 			$widgets_manager->register( new \SlideFirePro_Returns_Policy_Widget() );
+			// Contact Page widget is defined in the global namespace.
+			$widgets_manager->register( new \SlideFirePro_Contact_Page_Widget() );
 	}
 
     /**
