@@ -25,6 +25,14 @@ class SlideFirePro_Widgets {
 		add_action( 'wp_ajax_nopriv_slidefirePro_load_more_products', [ $this, 'ajax_load_more_products' ] );
 		add_action( 'wp_ajax_slidefirePro_add_to_cart', [ $this, 'ajax_add_to_cart' ] );
 		add_action( 'wp_ajax_nopriv_slidefirePro_add_to_cart', [ $this, 'ajax_add_to_cart' ] );
+		
+		// Cart Drawer AJAX handlers
+		add_action( 'wp_ajax_slidefire_get_cart_content', [ $this, 'ajax_get_cart_content' ] );
+		add_action( 'wp_ajax_nopriv_slidefire_get_cart_content', [ $this, 'ajax_get_cart_content' ] );
+		add_action( 'wp_ajax_slidefire_update_cart_quantity', [ $this, 'ajax_update_cart_quantity' ] );
+		add_action( 'wp_ajax_nopriv_slidefire_update_cart_quantity', [ $this, 'ajax_update_cart_quantity' ] );
+		add_action( 'wp_ajax_slidefire_remove_cart_item', [ $this, 'ajax_remove_cart_item' ] );
+		add_action( 'wp_ajax_nopriv_slidefire_remove_cart_item', [ $this, 'ajax_remove_cart_item' ] );
 	}
 
 	/**
@@ -190,6 +198,22 @@ class SlideFirePro_Widgets {
             [ 'select2' ],
             '1.25.0'
         );
+
+        // Register cart drawer assets
+        wp_register_style(
+            'slidefire-cart-drawer',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/cart-drawer.css',
+            [],
+            '1.26.0'
+        );
+
+        wp_register_script(
+            'slidefire-cart-drawer',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/js/cart-drawer.js',
+            [ 'jquery', 'elementor-frontend' ],
+            '1.26.0',
+            true
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -201,6 +225,7 @@ class SlideFirePro_Widgets {
 		wp_localize_script( 'slidefirePro-wc-product-filter', 'slideFireProAjax', $ajax_data );
 		wp_localize_script( 'slidefirePro-wc-products', 'slideFireProAjax', $ajax_data );
 		wp_localize_script( 'slidefirePro-product-customizer', 'slideFireProAjax', $ajax_data );
+		wp_localize_script( 'slidefire-cart-drawer', 'slideFireProCartAjax', $ajax_data );
 	}
 
 	/**
@@ -222,6 +247,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/widgets/class-my-account-widget.php' );
 		require_once( __DIR__. '/widgets/class-checkout-widget.php' );
 		require_once( __DIR__. '/../widgets/class-returns-policy-widget.php' );
+		require_once( __DIR__. '/widgets/class-cart-drawer-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -236,6 +262,7 @@ class SlideFirePro_Widgets {
 		$widgets_manager->register( new Widgets\Shipping_Page_Widget() );
 		$widgets_manager->register( new Widgets\My_Account_Widget() );
 		$widgets_manager->register( new Widgets\Checkout_Widget() );
+		$widgets_manager->register( new Widgets\Cart_Drawer_Widget() );
 			// Returns Policy widget is defined in the global namespace.
 			$widgets_manager->register( new \SlideFirePro_Returns_Policy_Widget() );
 	}
@@ -944,6 +971,328 @@ class SlideFirePro_Widgets {
 		endwhile;
 		
 		return ob_get_clean();
+	}
+
+	/**
+	 * AJAX handler for getting cart content
+	 */
+	public function ajax_get_cart_content() {
+		// Security check: verify the nonce.
+		check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
+		}
+
+		$widget_id = isset( $_POST['widget_id'] ) ? sanitize_text_field( $_POST['widget_id'] ) : '';
+
+		// Generate cart content HTML
+		$content = $this->generate_cart_content();
+		$cart_count = WC()->cart->get_cart_contents_count();
+
+		wp_send_json_success( [
+			'content' => $content,
+			'count' => $cart_count,
+			'widget_id' => $widget_id
+		] );
+	}
+
+	/**
+	 * AJAX handler for updating cart item quantity
+	 */
+	public function ajax_update_cart_quantity() {
+		// Security check: verify the nonce.
+		check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
+		}
+
+		$cart_item_key = sanitize_text_field( $_POST['cart_item_key'] ?? '' );
+		$quantity = intval( $_POST['quantity'] ?? 0 );
+
+		if ( empty( $cart_item_key ) || $quantity < 0 ) {
+			wp_send_json_error( [ 'message' => 'Invalid parameters' ] );
+		}
+
+		$result = WC()->cart->set_quantity( $cart_item_key, $quantity, true );
+
+		if ( $result ) {
+			$cart_item = WC()->cart->get_cart()[ $cart_item_key ] ?? null;
+			$cart_count = WC()->cart->get_cart_contents_count();
+			
+			$item_total = '';
+			if ( $cart_item && $quantity > 1 ) {
+				$_product = $cart_item['data'];
+				$item_total = WC()->cart->get_product_subtotal( $_product, $quantity );
+			}
+
+			wp_send_json_success( [
+				'message' => 'Quantity updated successfully',
+				'cart_count' => $cart_count,
+				'item_total' => $item_total,
+				'cart_totals' => $this->get_cart_totals()
+			] );
+		} else {
+			wp_send_json_error( [ 'message' => 'Failed to update quantity' ] );
+		}
+	}
+
+	/**
+	 * AJAX handler for removing cart item
+	 */
+	public function ajax_remove_cart_item() {
+		// Security check: verify the nonce.
+		check_ajax_referer( 'slidefirePro_filter_nonce', 'nonce' );
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
+		}
+
+		$cart_item_key = sanitize_text_field( $_POST['cart_item_key'] ?? '' );
+
+		if ( empty( $cart_item_key ) ) {
+			wp_send_json_error( [ 'message' => 'Invalid cart item key' ] );
+		}
+
+		$result = WC()->cart->remove_cart_item( $cart_item_key );
+
+		if ( $result ) {
+			$cart_count = WC()->cart->get_cart_contents_count();
+
+			wp_send_json_success( [
+				'message' => 'Item removed successfully',
+				'cart_count' => $cart_count,
+				'cart_totals' => $this->get_cart_totals()
+			] );
+		} else {
+			wp_send_json_error( [ 'message' => 'Failed to remove item' ] );
+		}
+	}
+
+	/**
+	 * Generate cart content HTML for AJAX responses
+	 */
+	private function generate_cart_content() {
+		if ( WC()->cart->is_empty() ) {
+			return $this->generate_empty_cart_content();
+		} else {
+			return $this->generate_cart_items_content() . $this->generate_cart_summary_content();
+		}
+	}
+
+	/**
+	 * Generate empty cart content
+	 */
+	private function generate_empty_cart_content() {
+		ob_start();
+		?>
+		<div class="slidefire-empty-cart">
+			<div class="slidefire-empty-cart-icon">
+				<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+					<line x1="3" y1="6" x2="21" y2="6"></line>
+					<path d="M16 10a4 4 0 0 1-8 0"></path>
+				</svg>
+			</div>
+			<h3 class="slidefire-empty-cart-title"><?php esc_html_e( 'Your cart is empty', 'slidefirePro-widgets' ); ?></h3>
+			<p class="slidefire-empty-cart-message"><?php esc_html_e( 'Add some tactical gear to get started', 'slidefirePro-widgets' ); ?></p>
+			<button class="slidefire-continue-shopping-button slidefire-close-drawer">
+				<?php esc_html_e( 'Continue Shopping', 'slidefirePro-widgets' ); ?>
+			</button>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Generate cart items content
+	 */
+	private function generate_cart_items_content() {
+		ob_start();
+		?>
+		<div class="slidefire-cart-items">
+			<?php
+			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+				$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+				$product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
+
+				if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters( 'woocommerce_cart_item_visible', true, $cart_item, $cart_item_key ) ) {
+					$this->render_cart_item( $cart_item_key, $cart_item, $_product );
+				}
+			}
+			?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render single cart item
+	 */
+	private function render_cart_item( $cart_item_key, $cart_item, $_product ) {
+		?>
+		<div class="slidefire-cart-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+			<div class="slidefire-cart-item-image">
+				<?php echo apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image(), $cart_item, $cart_item_key ); ?>
+			</div>
+			<div class="slidefire-cart-item-details">
+				<div class="slidefire-cart-item-header">
+					<h4 class="slidefire-cart-item-name">
+						<?php echo wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key ) ); ?>
+					</h4>
+					<button class="slidefire-remove-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>" aria-label="<?php esc_attr_e( 'Remove item', 'slidefirePro-widgets' ); ?>">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<line x1="18" y1="6" x2="6" y2="18"></line>
+							<line x1="6" y1="6" x2="18" y2="18"></line>
+						</svg>
+					</button>
+				</div>
+				<div class="slidefire-cart-item-meta">
+					<?php
+					// Display product attributes (size, color, etc.)
+					if ( ! empty( $cart_item['variation'] ) ) {
+						foreach ( $cart_item['variation'] as $name => $value ) {
+							if ( '' === $value ) continue;
+							$attribute_name = wc_attribute_label( str_replace( 'attribute_', '', $name ), $_product );
+							echo '<div class="slidefire-cart-item-variation">' . esc_html( $attribute_name ) . ': ' . esc_html( $value ) . '</div>';
+						}
+					}
+					?>
+				</div>
+				<div class="slidefire-cart-item-actions">
+					<div class="slidefire-quantity-controls">
+						<button class="slidefire-quantity-decrease" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>" <?php echo $cart_item['quantity'] <= 1 ? 'disabled' : ''; ?>>
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+							</svg>
+						</button>
+						<span class="slidefire-quantity-value"><?php echo esc_html( $cart_item['quantity'] ); ?></span>
+						<button class="slidefire-quantity-increase" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="12" y1="5" x2="12" y2="19"></line>
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+							</svg>
+						</button>
+					</div>
+					<div class="slidefire-cart-item-price">
+						<?php echo apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key ); ?>
+						<?php if ( $cart_item['quantity'] > 1 ) : ?>
+							<div class="slidefire-item-total">
+								<?php echo apply_filters( 'woocommerce_cart_item_subtotal', WC()->cart->get_product_subtotal( $_product, $cart_item['quantity'] ), $cart_item, $cart_item_key ); ?>
+							</div>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Generate cart summary content
+	 */
+	private function generate_cart_summary_content() {
+		$cart = WC()->cart;
+		$subtotal = $cart->get_subtotal();
+		$tax_rate = 0.08; // Default 8% tax rate
+		$tax_amount = $subtotal * $tax_rate;
+		$free_shipping_threshold = 100;
+		$standard_shipping = 15;
+		$shipping_cost = $subtotal >= $free_shipping_threshold ? 0 : $standard_shipping;
+		$total = $subtotal + $tax_amount + $shipping_cost;
+
+		ob_start();
+		?>
+		<div class="slidefire-cart-summary">
+			<div class="slidefire-summary-row">
+				<span class="slidefire-summary-label"><?php esc_html_e( 'Subtotal', 'slidefirePro-widgets' ); ?></span>
+				<span class="slidefire-summary-value"><?php echo wc_price( $subtotal ); ?></span>
+			</div>
+			<div class="slidefire-summary-row">
+				<span class="slidefire-summary-label"><?php esc_html_e( 'Tax', 'slidefirePro-widgets' ); ?></span>
+				<span class="slidefire-summary-value"><?php echo wc_price( $tax_amount ); ?></span>
+			</div>
+			<div class="slidefire-summary-row">
+				<span class="slidefire-summary-label"><?php esc_html_e( 'Shipping', 'slidefirePro-widgets' ); ?></span>
+				<span class="slidefire-summary-value">
+					<?php if ( $shipping_cost > 0 ) : ?>
+						<?php echo wc_price( $shipping_cost ); ?>
+					<?php else : ?>
+						<span class="slidefire-free-shipping"><?php esc_html_e( 'Free', 'slidefirePro-widgets' ); ?></span>
+					<?php endif; ?>
+				</span>
+			</div>
+			
+			<?php if ( $subtotal < $free_shipping_threshold && $subtotal > 0 ) : ?>
+				<div class="slidefire-free-shipping-notice">
+					<?php 
+					$remaining = $free_shipping_threshold - $subtotal;
+					echo sprintf(
+						esc_html__( 'Add %s more for free shipping', 'slidefirePro-widgets' ),
+						wc_price( $remaining )
+					);
+					?>
+				</div>
+			<?php endif; ?>
+			
+			<div class="slidefire-summary-separator"></div>
+			
+			<div class="slidefire-summary-row slidefire-summary-total">
+				<span class="slidefire-summary-label"><?php esc_html_e( 'Total', 'slidefirePro-widgets' ); ?></span>
+				<span class="slidefire-summary-value slidefire-total-price"><?php echo wc_price( $total ); ?></span>
+			</div>
+
+			<div class="slidefire-cart-actions">
+				<a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="slidefire-checkout-button">
+					<?php esc_html_e( 'Proceed to Checkout', 'slidefirePro-widgets' ); ?>
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+						<polyline points="12,5 19,12 12,19"></polyline>
+					</svg>
+				</a>
+				<button class="slidefire-continue-shopping-button slidefire-close-drawer">
+					<?php esc_html_e( 'Continue Shopping', 'slidefirePro-widgets' ); ?>
+				</button>
+			</div>
+
+			<div class="slidefire-security-badge">
+				<span class="slidefire-security-icon">🔒</span>
+				<span class="slidefire-security-text"><?php esc_html_e( 'Secure checkout powered by Stripe', 'slidefirePro-widgets' ); ?></span>
+			</div>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Get cart totals for AJAX responses
+	 */
+	private function get_cart_totals() {
+		$cart = WC()->cart;
+		$subtotal = $cart->get_subtotal();
+		$tax_rate = 0.08; // Default 8% tax rate
+		$tax_amount = $subtotal * $tax_rate;
+		$free_shipping_threshold = 100;
+		$standard_shipping = 15;
+		$shipping_cost = $subtotal >= $free_shipping_threshold ? 0 : $standard_shipping;
+		$total = $subtotal + $tax_amount + $shipping_cost;
+
+		$shipping_display = $shipping_cost > 0 ? wc_price( $shipping_cost ) : '<span class="slidefire-free-shipping">' . esc_html__( 'Free', 'slidefirePro-widgets' ) . '</span>';
+
+		return [
+			'subtotal' => wc_price( $subtotal ),
+			'tax' => wc_price( $tax_amount ),
+			'shipping' => $shipping_display,
+			'total' => wc_price( $total ),
+			'free_shipping_notice' => [
+				'show' => $subtotal < $free_shipping_threshold && $subtotal > 0,
+				'message' => sprintf(
+					esc_html__( 'Add %s more for free shipping', 'slidefirePro-widgets' ),
+					wc_price( $free_shipping_threshold - $subtotal )
+				)
+			]
+		];
 	}
 }
 
