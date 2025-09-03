@@ -5,6 +5,7 @@
 /elementor-pro/
 /woo-custom-product-addons/
 /components/
+checkout.md
 
 # Exclude development/reference files
 /resources/
