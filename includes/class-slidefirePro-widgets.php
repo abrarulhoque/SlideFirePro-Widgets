@@ -124,14 +124,14 @@ class SlideFirePro_Widgets {
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-customizer.css',
             [],
-            '1.28.0'
+            '1.29.0'
         );
 
         wp_register_script(
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-customizer.js',
             [ 'jquery', 'elementor-frontend', 'wc-add-to-cart-variation' ],
-            '1.28.0',
+            '1.29.0',
             true
         );
 
@@ -234,7 +234,10 @@ class SlideFirePro_Widgets {
 		// Localize script for AJAX
 		$ajax_data = [
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce( 'slidefirePro_filter_nonce' )
+			'nonce' => wp_create_nonce( 'slidefirePro_filter_nonce' ),
+			'checkout_url' => class_exists('WooCommerce') ? wc_get_checkout_url() : '',
+			'cart_url' => class_exists('WooCommerce') ? wc_get_cart_url() : '',
+			'shop_url' => class_exists('WooCommerce') ? wc_get_page_permalink('shop') : '',
 		];
 		
 		wp_localize_script( 'slidefirePro-category-filter', 'slideFireProAjax', $ajax_data );
@@ -532,12 +535,12 @@ class SlideFirePro_Widgets {
 		$cart_item_data = [];
 
 		// Add custom jersey fields if provided
-		if ( ! empty( $_POST['player_name'] ) ) {
-			$cart_item_data['player_name'] = sanitize_text_field( $_POST['player_name'] );
+		if ( ! empty( $_POST['slidefire_player_name'] ) ) {
+			$cart_item_data['player_name'] = sanitize_text_field( $_POST['slidefire_player_name'] );
 		}
 
-		if ( ! empty( $_POST['jersey_number'] ) ) {
-			$jersey_number = sanitize_text_field( $_POST['jersey_number'] );
+		if ( ! empty( $_POST['slidefire_jersey_number'] ) ) {
+			$jersey_number = sanitize_text_field( $_POST['slidefire_jersey_number'] );
 			// Validate jersey number
 			if ( ! preg_match( '/^[0-9]{1,2}$/', $jersey_number ) || intval( $jersey_number ) > 99 ) {
 				wp_send_json_error( [ 'message' => 'Invalid jersey number. Must be between 00-99.' ] );

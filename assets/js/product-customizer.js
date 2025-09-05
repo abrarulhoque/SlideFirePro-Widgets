@@ -7,15 +7,16 @@
     class ProductCustomizer {
         constructor(element) {
             this.$element = $(element);
-            this.$form = this.$element.find('.slidefire-cart-form');
+            this.$form = this.$element.find('form.cart');
             this.$addToCartBtn = this.$element.find('.add-to-cart-button');
             this.$buyNowBtn = this.$element.find('.buy-now-button');
             this.$wishlistBtn = this.$element.find('.wishlist-button');
             this.$variationSelects = this.$element.find('.variation-select');
             this.$customInputs = this.$element.find('.customization-input');
-            this.$quantityField = this.$element.find('.slidefire-quantity-field');
+            this.$quantityField = this.$element.find('.qty');
             this.$quantityDecrease = this.$element.find('.slidefire-quantity-decrease');
             this.$quantityIncrease = this.$element.find('.slidefire-quantity-increase');
+            this.isProcessing = false;
 
             this.init();
         }
@@ -27,10 +28,13 @@
         }
 
         bindEvents() {
-            // Add to cart button click
-            this.$addToCartBtn.on('click', (e) => {
-                e.preventDefault();
-                this.handleAddToCart();
+            // Add to cart form submission
+            this.$form.on('submit', (e) => {
+                if (this.isProcessing) {
+                    e.preventDefault();
+                    return false;
+                }
+                this.handleAddToCart(e);
             });
 
             // Buy now button click  
@@ -67,13 +71,17 @@
             });
 
             // Quantity field direct input
-            this.$quantityField.on('change', (e) => {
+            this.$quantityField.on('change input', (e) => {
                 this.validateQuantity(e.target);
             });
 
             this.$quantityField.on('keypress', (e) => {
-                // Only allow numbers
-                if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+                // Only allow numbers, backspace, delete, tab, enter, and arrow keys
+                const allowedKeys = [8, 9, 13, 37, 38, 39, 40, 46]; // backspace, tab, enter, arrows, delete
+                const isNumber = e.which >= 48 && e.which <= 57;
+                const isNumpad = e.which >= 96 && e.which <= 105;
+                
+                if (!isNumber && !isNumpad && allowedKeys.indexOf(e.which) === -1) {
                     e.preventDefault();
                 }
             });
@@ -82,46 +90,73 @@
         setupVariationHandling() {
             if (this.$variationSelects.length > 0) {
                 // Initialize WooCommerce variations if available
-                if (typeof wc_add_to_cart_variation_params !== 'undefined') {
-                    this.$form.find('.variations_form').wc_variation_form();
+                if (typeof wc_add_to_cart_variation_params !== 'undefined' && $.fn.wc_variation_form) {
+                    // Check if this form has variations
+                    if (this.$form.hasClass('variations_form') || this.$form.find('.variations').length) {
+                        this.$form.wc_variation_form();
+                    }
                 }
+                
+                // Bind variation change events
+                this.$variationSelects.on('change', () => {
+                    this.updateAddToCartButtonState();
+                });
             }
         }
 
-        handleAddToCart() {
+        handleAddToCart(e) {
+            if (this.isProcessing) {
+                e.preventDefault();
+                return false;
+            }
+
             // Show loading state
+            this.isProcessing = true;
             this.setButtonState(this.$addToCartBtn, 'loading');
 
             // Validate inputs
             if (!this.validateForm()) {
                 this.setButtonState(this.$addToCartBtn, 'error');
+                this.isProcessing = false;
                 setTimeout(() => {
                     this.resetButtonState(this.$addToCartBtn);
                 }, 3000);
-                return;
+                e.preventDefault();
+                return false;
             }
 
-            // Get form data
-            const formData = this.getFormData();
-
-            // Handle different product types
+            // Check for variable products
             const productType = this.getProductType();
-            
             if (productType === 'variable' && !this.areVariationsSelected()) {
                 this.showNotification('Please select all product options.', 'error');
                 this.setButtonState(this.$addToCartBtn, 'error');
+                this.isProcessing = false;
                 setTimeout(() => {
                     this.resetButtonState(this.$addToCartBtn);
                 }, 3000);
-                return;
+                e.preventDefault();
+                return false;
             }
 
-            // Use WooCommerce AJAX add to cart or custom handler
-            if (productType === 'simple') {
-                this.addSimpleProductToCart(formData);
-            } else {
-                this.addVariableProductToCart(formData);
-            }
+            // Add custom data to form before submission
+            this.addCustomDataToForm();
+
+            // Let WooCommerce handle the form submission naturally
+            // but add success/error handling
+            const self = this;
+            setTimeout(() => {
+                // Check for WooCommerce notices
+                const $notices = $('.woocommerce-notices-wrapper');
+                if ($notices.find('.woocommerce-error').length > 0) {
+                    self.handleAddToCartError($notices.find('.woocommerce-error').text());
+                } else if ($notices.find('.woocommerce-message').length > 0) {
+                    self.handleAddToCartSuccess();
+                }
+                self.isProcessing = false;
+            }, 1000);
+
+            // Allow form submission to continue
+            return true;
         }
 
         handleBuyNow() {
@@ -253,36 +288,21 @@
             return formData;
         }
 
-        addSimpleProductToCart(formData) {
-            $.ajax({
-                url: slideFireProAjax.ajax_url,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: (response) => {
-                    if (response.success) {
-                        this.handleAddToCartSuccess(response.data);
-                    } else {
-                        this.handleAddToCartError(response.data.message || 'Failed to add product to cart.');
-                    }
-                },
-                error: () => {
-                    this.handleAddToCartError('Failed to add product to cart.');
+        addCustomDataToForm() {
+            // Add custom inputs as hidden fields if they have values
+            this.$customInputs.each((index, input) => {
+                const $input = $(input);
+                const name = $input.attr('name');
+                const value = $input.val().trim();
+                
+                if (name && value) {
+                    // Remove existing hidden field if it exists
+                    this.$form.find(`input[name="${name}"]`).remove();
+                    
+                    // Add as hidden field
+                    this.$form.append(`<input type="hidden" name="${name}" value="${value}" />`);
                 }
             });
-        }
-
-        addVariableProductToCart(formData) {
-            // Use the hidden WooCommerce form for variable products
-            const $hiddenForm = this.$form.find('.variations_form');
-            
-            if ($hiddenForm.length > 0) {
-                // Trigger WooCommerce add to cart
-                $hiddenForm.find('.single_add_to_cart_button').trigger('click');
-            } else {
-                this.addSimpleProductToCart(formData);
-            }
         }
 
         addToCartForBuyNow(formData) {
@@ -344,8 +364,12 @@
                 $(document.body).trigger('wc_fragment_refresh');
             }
 
+            // Trigger WooCommerce added to cart event
+            $(document.body).trigger('added_to_cart');
+
             setTimeout(() => {
                 this.resetButtonState(this.$addToCartBtn);
+                this.isProcessing = false;
             }, 3000);
         }
 
@@ -355,6 +379,7 @@
             
             setTimeout(() => {
                 this.resetButtonState(this.$addToCartBtn);
+                this.isProcessing = false;
             }, 3000);
         }
 
@@ -415,7 +440,7 @@
 
         getProductType() {
             // Determine if product is simple or variable
-            return this.$variationSelects.length > 0 ? 'variable' : 'simple';
+            return this.$element.data('product-type') || (this.$variationSelects.length > 0 ? 'variable' : 'simple');
         }
 
         areVariationsSelected() {
@@ -514,16 +539,29 @@
             
             // Update decrease button state
             if (currentQty <= minQty) {
-                this.$quantityDecrease.prop('disabled', true);
+                this.$quantityDecrease.prop('disabled', true).addClass('disabled');
             } else {
-                this.$quantityDecrease.prop('disabled', false);
+                this.$quantityDecrease.prop('disabled', false).removeClass('disabled');
             }
             
             // Update increase button state
             if (currentQty >= maxQty) {
-                this.$quantityIncrease.prop('disabled', true);
+                this.$quantityIncrease.prop('disabled', true).addClass('disabled');
             } else {
-                this.$quantityIncrease.prop('disabled', false);
+                this.$quantityIncrease.prop('disabled', false).removeClass('disabled');
+            }
+        }
+
+        updateAddToCartButtonState() {
+            const productType = this.getProductType();
+            
+            if (productType === 'variable') {
+                const allSelected = this.areVariationsSelected();
+                if (allSelected) {
+                    this.$addToCartBtn.prop('disabled', false).removeClass('disabled');
+                } else {
+                    this.$addToCartBtn.prop('disabled', true).addClass('disabled');
+                }
             }
         }
     }
