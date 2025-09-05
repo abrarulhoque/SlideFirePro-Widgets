@@ -124,14 +124,14 @@ class SlideFirePro_Widgets {
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-customizer.css',
             [],
-            '1.15.0'
+            '1.28.0'
         );
 
         wp_register_script(
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-customizer.js',
             [ 'jquery', 'elementor-frontend', 'wc-add-to-cart-variation' ],
-            '1.15.0',
+            '1.28.0',
             true
         );
 
@@ -502,19 +502,75 @@ class SlideFirePro_Widgets {
 			wp_send_json_error( [ 'message' => 'Invalid product ID' ] );
 		}
 
-		$result = WC()->cart->add_to_cart( $product_id, $quantity );
+		$product = wc_get_product( $product_id );
+		if ( ! $product ) {
+			wp_send_json_error( [ 'message' => 'Product not found' ] );
+		}
 
-		if ( $result ) {
-			// Get updated cart fragments
-			$fragments = WC()->cart->get_cart_for_session();
-			
-			wp_send_json_success( [
-				'message' => 'Product added to cart successfully',
-				'cart_hash' => WC()->cart->get_cart_hash(),
-				'fragments' => $fragments
-			] );
-		} else {
-			wp_send_json_error( [ 'message' => 'Failed to add product to cart' ] );
+		$variation_id = 0;
+		$variation_data = [];
+
+		// Handle variable products
+		if ( $product->is_type( 'variable' ) ) {
+			foreach ( $_POST as $key => $value ) {
+				if ( strpos( $key, 'attribute_' ) === 0 ) {
+					$variation_data[ $key ] = sanitize_text_field( $value );
+				}
+			}
+
+			if ( ! empty( $variation_data ) ) {
+				$data_store = WC_Data_Store::load( 'product' );
+				$variation_id = $data_store->find_matching_product_variation( $product, $variation_data );
+				
+				if ( ! $variation_id ) {
+					wp_send_json_error( [ 'message' => 'Please select product options' ] );
+				}
+			}
+		}
+
+		// Prepare cart item data for custom fields
+		$cart_item_data = [];
+
+		// Add custom jersey fields if provided
+		if ( ! empty( $_POST['player_name'] ) ) {
+			$cart_item_data['player_name'] = sanitize_text_field( $_POST['player_name'] );
+		}
+
+		if ( ! empty( $_POST['jersey_number'] ) ) {
+			$jersey_number = sanitize_text_field( $_POST['jersey_number'] );
+			// Validate jersey number
+			if ( ! preg_match( '/^[0-9]{1,2}$/', $jersey_number ) || intval( $jersey_number ) > 99 ) {
+				wp_send_json_error( [ 'message' => 'Invalid jersey number. Must be between 00-99.' ] );
+			}
+			$cart_item_data['jersey_number'] = $jersey_number;
+		}
+
+		// Add to cart
+		try {
+			if ( $product->is_type( 'variable' ) && $variation_id ) {
+				$result = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_data, $cart_item_data );
+			} else {
+				$result = WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $cart_item_data );
+			}
+
+			if ( $result ) {
+				// Get updated cart fragments for mini cart updates
+				ob_start();
+				WC()->cart->calculate_totals();
+				wc_get_template( 'cart/mini-cart.php' );
+				$mini_cart = ob_get_clean();
+
+				wp_send_json_success( [
+					'message' => 'Product added to cart successfully',
+					'cart_hash' => WC()->cart->get_cart_hash(),
+					'cart_count' => WC()->cart->get_cart_contents_count(),
+					'mini_cart' => $mini_cart
+				] );
+			} else {
+				wp_send_json_error( [ 'message' => 'Failed to add product to cart' ] );
+			}
+		} catch ( Exception $e ) {
+			wp_send_json_error( [ 'message' => $e->getMessage() ] );
 		}
 	}
 

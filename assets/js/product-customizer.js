@@ -13,6 +13,9 @@
             this.$wishlistBtn = this.$element.find('.wishlist-button');
             this.$variationSelects = this.$element.find('.variation-select');
             this.$customInputs = this.$element.find('.customization-input');
+            this.$quantityField = this.$element.find('.slidefire-quantity-field');
+            this.$quantityDecrease = this.$element.find('.slidefire-quantity-decrease');
+            this.$quantityIncrease = this.$element.find('.slidefire-quantity-increase');
 
             this.init();
         }
@@ -20,6 +23,7 @@
         init() {
             this.bindEvents();
             this.setupVariationHandling();
+            this.updateQuantityButtonStates();
         }
 
         bindEvents() {
@@ -49,6 +53,29 @@
             // Custom input validation
             this.$customInputs.on('input', (e) => {
                 this.validateCustomInput(e.target);
+            });
+
+            // Quantity control events
+            this.$quantityDecrease.on('click', (e) => {
+                e.preventDefault();
+                this.decreaseQuantity();
+            });
+
+            this.$quantityIncrease.on('click', (e) => {
+                e.preventDefault();
+                this.increaseQuantity();
+            });
+
+            // Quantity field direct input
+            this.$quantityField.on('change', (e) => {
+                this.validateQuantity(e.target);
+            });
+
+            this.$quantityField.on('keypress', (e) => {
+                // Only allow numbers
+                if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+                    e.preventDefault();
+                }
             });
         }
 
@@ -191,8 +218,9 @@
             const productId = this.getProductId();
             formData.append('product_id', productId);
 
-            // Add quantity
-            formData.append('quantity', 1);
+            // Add quantity from the quantity field
+            const quantity = parseInt(this.$quantityField.val()) || 1;
+            formData.append('quantity', quantity);
 
             // Add variations if any
             this.$variationSelects.each((index, select) => {
@@ -215,11 +243,11 @@
             });
 
             // Add action
-            formData.append('action', 'woocommerce_add_to_cart');
+            formData.append('action', 'slidefirePro_add_to_cart');
 
-            // Add security nonce if available
-            if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
-                formData.append('security', wc_add_to_cart_params.add_to_cart_nonce);
+            // Add security nonce
+            if (typeof slideFireProAjax !== 'undefined') {
+                formData.append('nonce', slideFireProAjax.nonce);
             }
 
             return formData;
@@ -227,16 +255,16 @@
 
         addSimpleProductToCart(formData) {
             $.ajax({
-                url: wc_add_to_cart_params.ajax_url.toString().replace('%%endpoint%%', 'add_to_cart'),
+                url: slideFireProAjax.ajax_url,
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: (response) => {
-                    if (response.error) {
-                        this.handleAddToCartError(response.error);
+                    if (response.success) {
+                        this.handleAddToCartSuccess(response.data);
                     } else {
-                        this.handleAddToCartSuccess(response);
+                        this.handleAddToCartError(response.data.message || 'Failed to add product to cart.');
                     }
                 },
                 error: () => {
@@ -259,17 +287,17 @@
 
         addToCartForBuyNow(formData) {
             $.ajax({
-                url: wc_add_to_cart_params.ajax_url.toString().replace('%%endpoint%%', 'add_to_cart'),
+                url: slideFireProAjax.ajax_url,
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: (response) => {
-                    if (response.error) {
-                        this.handleBuyNowError(response.error);
-                    } else {
+                    if (response.success) {
                         // Redirect to checkout
-                        window.location.href = wc_add_to_cart_params.checkout_url;
+                        window.location.href = slideFireProAjax.checkout_url || '/checkout/';
+                    } else {
+                        this.handleBuyNowError(response.data.message || 'Failed to process buy now request.');
                     }
                 },
                 error: () => {
@@ -283,11 +311,11 @@
             const wishlistData = {
                 action: 'add_to_wishlist',
                 product_id: productId,
-                security: this.getWishlistNonce()
+                nonce: slideFireProAjax.nonce
             };
 
             $.ajax({
-                url: wc_add_to_cart_params.ajax_url,
+                url: slideFireProAjax.ajax_url,
                 type: 'POST',
                 data: wishlistData,
                 success: (response) => {
@@ -436,6 +464,67 @@
         updateStock(variations) {
             // Update stock status based on selected variations
             // This would integrate with WooCommerce variation stock display
+        }
+
+        // Quantity control methods
+        decreaseQuantity() {
+            const currentQty = parseInt(this.$quantityField.val()) || 1;
+            const minQty = parseInt(this.$quantityField.attr('min')) || 1;
+            
+            if (currentQty > minQty) {
+                this.$quantityField.val(currentQty - 1);
+                this.updateQuantityButtonStates();
+            }
+        }
+
+        increaseQuantity() {
+            const currentQty = parseInt(this.$quantityField.val()) || 1;
+            const maxQty = parseInt(this.$quantityField.attr('max')) || 9999;
+            
+            if (currentQty < maxQty) {
+                this.$quantityField.val(currentQty + 1);
+                this.updateQuantityButtonStates();
+            }
+        }
+
+        validateQuantity(input) {
+            const $input = $(input);
+            const value = parseInt($input.val()) || 1;
+            const minQty = parseInt($input.attr('min')) || 1;
+            const maxQty = parseInt($input.attr('max')) || 9999;
+            
+            let validatedValue = value;
+            
+            if (value < minQty) {
+                validatedValue = minQty;
+                this.showNotification(`Minimum quantity is ${minQty}`, 'warning');
+            } else if (value > maxQty) {
+                validatedValue = maxQty;
+                this.showNotification(`Maximum quantity is ${maxQty}`, 'warning');
+            }
+            
+            $input.val(validatedValue);
+            this.updateQuantityButtonStates();
+        }
+
+        updateQuantityButtonStates() {
+            const currentQty = parseInt(this.$quantityField.val()) || 1;
+            const minQty = parseInt(this.$quantityField.attr('min')) || 1;
+            const maxQty = parseInt(this.$quantityField.attr('max')) || 9999;
+            
+            // Update decrease button state
+            if (currentQty <= minQty) {
+                this.$quantityDecrease.prop('disabled', true);
+            } else {
+                this.$quantityDecrease.prop('disabled', false);
+            }
+            
+            // Update increase button state
+            if (currentQty >= maxQty) {
+                this.$quantityIncrease.prop('disabled', true);
+            } else {
+                this.$quantityIncrease.prop('disabled', false);
+            }
         }
     }
 

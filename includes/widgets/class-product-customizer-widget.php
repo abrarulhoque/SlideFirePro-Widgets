@@ -130,6 +130,30 @@ class Product_Customizer_Widget extends Widget_Base {
         );
 
         $this->add_control(
+            'enable_quantity',
+            [
+                'label' => esc_html__('Show Quantity Field', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__('Show', 'slidefirePro-widgets'),
+                'label_off' => esc_html__('Hide', 'slidefirePro-widgets'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'quantity_label',
+            [
+                'label' => esc_html__('Quantity Label', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::TEXT,
+                'default' => esc_html__('Quantity', 'slidefirePro-widgets'),
+                'condition' => [
+                    'enable_quantity' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
             'enable_buy_now',
             [
                 'label' => esc_html__('Show Buy Now Button', 'slidefirePro-widgets'),
@@ -335,6 +359,130 @@ class Product_Customizer_Widget extends Widget_Base {
 
         $this->end_controls_section();
 
+        // Style Section - Quantity Field
+        $this->start_controls_section(
+            'quantity_style_section',
+            [
+                'label' => esc_html__('Quantity Field', 'slidefirePro-widgets'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'enable_quantity' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'quantity_typography',
+                'selector' => '{{WRAPPER}} .slidefire-quantity-field',
+            ]
+        );
+
+        $this->add_control(
+            'quantity_text_color',
+            [
+                'label' => esc_html__('Text Color', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-field' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'quantity_bg_color',
+            [
+                'label' => esc_html__('Background Color', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#1a1a1a',
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-field' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'quantity_border',
+                'selector' => '{{WRAPPER}} .slidefire-quantity-field',
+            ]
+        );
+
+        $this->add_control(
+            'quantity_border_radius',
+            [
+                'label' => esc_html__('Border Radius', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em', 'rem'],
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-field' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'quantity_padding',
+            [
+                'label' => esc_html__('Padding', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em', 'rem'],
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-field' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        // Quantity Controls (Buttons)
+        $this->add_control(
+            'quantity_controls_heading',
+            [
+                'label' => esc_html__('Quantity Controls', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'quantity_control_color',
+            [
+                'label' => esc_html__('Control Color', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#23B2EE',
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-btn' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'quantity_control_bg_color',
+            [
+                'label' => esc_html__('Control Background', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::COLOR,
+                'default' => 'transparent',
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-btn' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'quantity_control_hover_color',
+            [
+                'label' => esc_html__('Control Hover Color', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#1e9fdb',
+                'selectors' => [
+                    '{{WRAPPER}} .slidefire-quantity-btn:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Style Section - Buttons
         $this->start_controls_section(
             'button_style_section',
@@ -518,7 +666,7 @@ class Product_Customizer_Widget extends Widget_Base {
         $settings = $this->get_settings_for_display();
 
         ?>
-        <div class="slidefire-product-customizer">
+        <div class="slidefire-product-customizer" data-product-id="<?php echo esc_attr($product->get_id()); ?>" data-product-type="<?php echo esc_attr($product->get_type()); ?>">
             <?php if ($settings['enable_variations'] === 'yes') : ?>
                 <!-- Size Selection -->
                 <div class="size-section space-y-4">
@@ -588,6 +736,35 @@ class Product_Customizer_Widget extends Widget_Base {
                 wcpa_render_product_form();
             }
             ?>
+
+            <?php if ($settings['enable_quantity'] === 'yes') : ?>
+                <!-- Quantity Section -->
+                <div class="quantity-section space-y-2 mb-4">
+                    <label class="block text-sm font-medium mb-2"><?php echo esc_html($settings['quantity_label']); ?></label>
+                    <div class="slidefire-quantity-wrapper flex items-center">
+                        <button class="slidefire-quantity-btn slidefire-quantity-decrease" type="button" aria-label="<?php esc_attr_e('Decrease quantity', 'slidefirePro-widgets'); ?>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                        <input 
+                            type="number" 
+                            name="quantity" 
+                            class="slidefire-quantity-field" 
+                            value="1" 
+                            min="1" 
+                            max="<?php echo esc_attr($product->get_max_purchase_quantity()); ?>"
+                            step="1"
+                        />
+                        <button class="slidefire-quantity-btn slidefire-quantity-increase" type="button" aria-label="<?php esc_attr_e('Increase quantity', 'slidefirePro-widgets'); ?>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="actions-section space-y-4">
