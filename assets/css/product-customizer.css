@@ -472,6 +472,54 @@
     display: none !important;
 }
 
+/* WCPA Integration Styles */
+.slidefire-product-customizer .wcpa_form_outer {
+    margin: 1rem 0;
+    width: 100%;
+    background-color: var(--slidefire-card);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.slidefire-product-customizer .wcpa_wrap {
+    padding: 0;
+}
+
+.slidefire-product-customizer .wcpa_field_label {
+    color: var(--slidefire-foreground) !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.slidefire-product-customizer .wcpa_field {
+    background-color: var(--slidefire-input-background) !important;
+    border: 1px solid var(--slidefire-border) !important;
+    color: var(--slidefire-foreground) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem !important;
+}
+
+.slidefire-product-customizer .wcpa_field:focus {
+    border-color: var(--slidefire-primary) !important;
+    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+}
+
+.slidefire-product-customizer .wcpa_field_desc {
+    color: var(--slidefire-muted-foreground) !important;
+    font-size: 0.75rem !important;
+    margin-top: 0.25rem !important;
+}
+
+.slidefire-product-customizer .wcpa_field_wrap {
+    margin-bottom: 1rem !important;
+}
+
+.slidefire-product-customizer .wcpa_row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+}
+
 /* Custom field styling */
 .customization-grid {
     display: grid;

@@ -64,50 +64,12 @@ class Product_Customizer_Widget extends Widget_Base {
         );
 
         $this->add_control(
-            'enable_customization',
+            'customization_info',
             [
-                'label' => esc_html__('Show Customization Form', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'slidefirePro-widgets'),
-                'label_off' => esc_html__('Hide', 'slidefirePro-widgets'),
-                'return_value' => 'yes',
-                'default' => 'yes',
-            ]
-        );
-
-        $this->add_control(
-            'customization_title',
-            [
-                'label' => esc_html__('Customization Title', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Jersey Customization', 'slidefirePro-widgets'),
-                'condition' => [
-                    'enable_customization' => 'yes',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'player_name_label',
-            [
-                'label' => esc_html__('Player Name Label', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Player Name', 'slidefirePro-widgets'),
-                'condition' => [
-                    'enable_customization' => 'yes',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'jersey_number_label',
-            [
-                'label' => esc_html__('Jersey Number Label', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Jersey Number', 'slidefirePro-widgets'),
-                'condition' => [
-                    'enable_customization' => 'yes',
-                ],
+                'label' => esc_html__('Product Customization', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::RAW_HTML,
+                'raw' => esc_html__('Product customization fields (like name and number) are automatically handled by the WooCommerce Custom Product Addons plugin and will appear dynamically based on your product configuration.', 'slidefirePro-widgets'),
+                'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
             ]
         );
 
@@ -202,157 +164,58 @@ class Product_Customizer_Widget extends Widget_Base {
 
         $this->end_controls_section();
 
-        // Style Section - Customization Form
+        // Style Section - WCPA Form Integration
         $this->start_controls_section(
-            'customization_style_section',
+            'wcpa_style_section',
             [
-                'label' => esc_html__('Customization Form', 'slidefirePro-widgets'),
+                'label' => esc_html__('Custom Product Fields', 'slidefirePro-widgets'),
                 'tab' => Controls_Manager::TAB_STYLE,
-                'condition' => [
-                    'enable_customization' => 'yes',
-                ],
             ]
         );
 
         $this->add_control(
-            'customization_bg_color',
+            'wcpa_styling_info',
             [
-                'label' => esc_html__('Background Color', 'slidefirePro-widgets'),
+                'label' => esc_html__('Styling Information', 'slidefirePro-widgets'),
+                'type' => Controls_Manager::RAW_HTML,
+                'raw' => esc_html__('Custom product fields styling can be controlled through the WooCommerce Custom Product Addons plugin settings or by adding CSS targeting ".wcpa_form_outer" classes.', 'slidefirePro-widgets'),
+                'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+            ]
+        );
+
+        $this->add_control(
+            'wcpa_form_bg_color',
+            [
+                'label' => esc_html__('Form Background Color', 'slidefirePro-widgets'),
                 'type' => Controls_Manager::COLOR,
-                'default' => '#1a1a1a',
+                'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .customization-section' => 'background-color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Border::get_type(),
-            [
-                'name' => 'customization_border',
-                'selector' => '{{WRAPPER}} .customization-section',
-            ]
-        );
-
-        $this->add_control(
-            'customization_border_radius',
-            [
-                'label' => esc_html__('Border Radius', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => ['px', '%', 'em', 'rem'],
-                'selectors' => [
-                    '{{WRAPPER}} .customization-section' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wcpa_form_outer' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .wcpa_wrap' => 'background-color: {{VALUE}};',
                 ],
             ]
         );
 
         $this->add_responsive_control(
-            'customization_padding',
+            'wcpa_form_padding',
             [
-                'label' => esc_html__('Padding', 'slidefirePro-widgets'),
+                'label' => esc_html__('Form Padding', 'slidefirePro-widgets'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em', 'rem'],
                 'selectors' => [
-                    '{{WRAPPER}} .customization-section' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'customization_title_typography',
-                'label' => esc_html__('Title Typography', 'slidefirePro-widgets'),
-                'selector' => '{{WRAPPER}} .customization-title',
-            ]
-        );
-
-        $this->add_control(
-            'customization_title_color',
-            [
-                'label' => esc_html__('Title Color', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#23B2EE',
-                'selectors' => [
-                    '{{WRAPPER}} .customization-title' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->end_controls_section();
-
-        // Style Section - Input Fields
-        $this->start_controls_section(
-            'input_style_section',
-            [
-                'label' => esc_html__('Input Fields', 'slidefirePro-widgets'),
-                'tab' => Controls_Manager::TAB_STYLE,
-                'condition' => [
-                    'enable_customization' => 'yes',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'input_typography',
-                'selector' => '{{WRAPPER}} .customization-input',
-            ]
-        );
-
-        $this->add_control(
-            'input_text_color',
-            [
-                'label' => esc_html__('Text Color', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#ffffff',
-                'selectors' => [
-                    '{{WRAPPER}} .customization-input' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'input_bg_color',
-            [
-                'label' => esc_html__('Background Color', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#1a1a1a',
-                'selectors' => [
-                    '{{WRAPPER}} .customization-input' => 'background-color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Border::get_type(),
-            [
-                'name' => 'input_border',
-                'selector' => '{{WRAPPER}} .customization-input',
-            ]
-        );
-
-        $this->add_control(
-            'input_border_radius',
-            [
-                'label' => esc_html__('Border Radius', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => ['px', '%', 'em', 'rem'],
-                'selectors' => [
-                    '{{WRAPPER}} .customization-input' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wcpa_form_outer' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
 
         $this->add_responsive_control(
-            'input_padding',
+            'wcpa_form_margin',
             [
-                'label' => esc_html__('Padding', 'slidefirePro-widgets'),
+                'label' => esc_html__('Form Margin', 'slidefirePro-widgets'),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%', 'em', 'rem'],
                 'selectors' => [
-                    '{{WRAPPER}} .customization-input' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .wcpa_form_outer' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -728,59 +591,10 @@ class Product_Customizer_Widget extends Widget_Base {
                     </div>
                 <?php endif; ?>
 
-                <?php if ($settings['enable_customization'] === 'yes') : ?>
-                    <!-- Customization Form -->
-                    <div class="customization-section mb-4">
-                        <h3 class="customization-title mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2">
-                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l11 11Z"/>
-                            </svg>
-                            <?php echo esc_html($settings['customization_title']); ?>
-                        </h3>
-                        
-                        <div class="customization-grid">
-                            <div class="customization-field">
-                                <label class="block text-sm font-medium mb-2"><?php echo esc_html($settings['player_name_label']); ?></label>
-                                <input
-                                    type="text"
-                                    name="slidefire_player_name"
-                                    class="customization-input"
-                                    placeholder="<?php esc_attr_e('Enter your name', 'slidefirePro-widgets'); ?>"
-                                    maxlength="20"
-                                />
-                                <p class="text-xs text-muted-foreground mt-1"><?php esc_html_e('Max 20 characters', 'slidefirePro-widgets'); ?></p>
-                            </div>
-                            
-                            <div class="customization-field">
-                                <label class="block text-sm font-medium mb-2"><?php echo esc_html($settings['jersey_number_label']); ?></label>
-                                <input
-                                    type="text"
-                                    name="slidefire_jersey_number"
-                                    class="customization-input"
-                                    placeholder="00"
-                                    maxlength="2"
-                                    pattern="[0-9]*"
-                                />
-                                <p class="text-xs text-muted-foreground mt-1"><?php esc_html_e('Numbers 00-99', 'slidefirePro-widgets'); ?></p>
-                            </div>
-                        </div>
-                        
-                        <div class="customization-note">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2">
-                                <line x1="4" x2="20" y1="9" y2="9"/>
-                                <line x1="4" x2="20" y1="15" y2="15"/>
-                                <line x1="10" x2="14" y1="3" y2="21"/>
-                            </svg>
-                            <span><?php esc_html_e('If no name or number is needed, please leave them blank', 'slidefirePro-widgets'); ?></span>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
                 <?php
-                // Render product addons form if the plugin is active
-                if (function_exists('wcpa_render_product_form')) {
-                    wcpa_render_product_form();
-                }
+                // Let WCPA plugin render its fields naturally through WooCommerce hooks
+                // This will automatically render WCPA fields if they exist for this product
+                // The WCPA plugin hooks into 'woocommerce_before_add_to_cart_button' by default
                 ?>
 
                 <?php if ($settings['enable_quantity'] === 'yes') : ?>

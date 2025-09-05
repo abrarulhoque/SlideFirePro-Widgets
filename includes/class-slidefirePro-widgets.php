@@ -124,14 +124,14 @@ class SlideFirePro_Widgets {
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/product-customizer.css',
             [],
-            '1.29.0'
+            '1.30.0'
         );
 
         wp_register_script(
             'slidefirePro-product-customizer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/product-customizer.js',
             [ 'jquery', 'elementor-frontend', 'wc-add-to-cart-variation' ],
-            '1.29.0',
+            '1.30.0',
             true
         );
 
