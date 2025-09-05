@@ -798,36 +798,149 @@
     flex: 1;
 }
 
-/* Override WooCommerce variations styling */
+/* WooCommerce Variations Styling - ProductPage Select Component Match */
 .slidefire-product-customizer .variations {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem !important;
 }
 
-.slidefire-product-customizer .variations .label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: var(--slidefire-foreground);
+.slidefire-product-customizer .variations .label,
+.slidefire-product-customizer .variations label {
+    display: block !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 0.5rem !important;
+    color: var(--slidefire-foreground) !important;
+    line-height: 1.25rem !important;
 }
 
 .slidefire-product-customizer .variations select {
+    /* Base Select Trigger Styling - Matching ProductPage Select */
     width: 100% !important;
     background-color: var(--slidefire-input-background) !important;
     border: 1px solid var(--slidefire-border) !important;
     color: var(--slidefire-foreground) !important;
-    padding: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
     border-radius: 0.375rem !important;
     font-size: 0.875rem !important;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
-    height: 2.75rem !important;
+    line-height: 1.25rem !important;
+    height: 2.25rem !important;
     box-sizing: border-box !important;
+    outline: none !important;
+    transition: all 0.2s ease-in-out !important;
+    
+    /* Flex layout for proper spacing */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    
+    /* Text and placeholder styling */
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    
+    /* Disabled state */
+    opacity: 1 !important;
 }
 
+/* Focus state - matching ProductPage Select focus */
 .slidefire-product-customizer .variations select:focus {
     outline: none !important;
     border-color: var(--slidefire-primary) !important;
-    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.2) !important;
+}
+
+/* Hover state */
+.slidefire-product-customizer .variations select:hover {
+    background-color: rgba(26, 26, 26, 0.8) !important;
+}
+
+/* Disabled state */
+.slidefire-product-customizer .variations select:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+/* Style the select options when dropdown is open */
+.slidefire-product-customizer .variations select option {
+    background-color: var(--slidefire-card) !important;
+    color: var(--slidefire-foreground) !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+/* Custom dropdown arrow - integrated into main select styling above */
+.slidefire-product-customizer .variations select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m6 9 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1rem !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Variation table styling - Remove table appearance for ProductPage match */
+.slidefire-product-customizer .variations_form .variations {
+    margin-bottom: 1.5rem !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.slidefire-product-customizer .variations_form .variations tbody,
+.slidefire-product-customizer .variations_form .variations tr,
+.slidefire-product-customizer .variations_form .variations td {
+    display: block !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+}
+
+.slidefire-product-customizer .variations_form .variations tr {
+    margin-bottom: 1rem !important;
+}
+
+.slidefire-product-customizer .variations_form .variations tr:last-child {
+    margin-bottom: 0 !important;
+}
+
+.slidefire-product-customizer .variations_form .variations td.label {
+    width: 100% !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.slidefire-product-customizer .variations_form .variations td.value {
+    width: 100% !important;
+}
+
+/* Make each variation look like a standalone form field */
+.slidefire-product-customizer .variations_form .variations tr {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Reset button styling */
+.slidefire-product-customizer .reset_variations {
+    color: var(--slidefire-primary) !important;
+    font-size: 0.875rem !important;
+    text-decoration: none !important;
+    margin-top: 0.5rem !important;
+    display: inline-block !important;
+    transition: color 0.2s ease-in-out !important;
+}
+
+.slidefire-product-customizer .reset_variations:hover {
+    color: var(--slidefire-foreground) !important;
+    text-decoration: underline !important;
+}
+
+/* Variation spacing improvements */
+.slidefire-product-customizer .variations_form .variations tr {
+    margin-bottom: 1rem !important;
+}
+
+.slidefire-product-customizer .variations_form .variations tr:last-child {
+    margin-bottom: 0 !important;
 }
 
 /* Spacing improvements */
