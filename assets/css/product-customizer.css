@@ -1,4 +1,4 @@
-/* Product Customizer Widget Styles */
+/* Product Customizer Widget Styles - Matching ProductPage.tsx Design */
 :root {
     --slidefire-primary: #23B2EE;
     --slidefire-primary-foreground: #000000;
@@ -15,22 +15,80 @@
 
 /* Main Container - Native WooCommerce Integration */
 .slidefire-product-customizer {
+    background-color: var(--slidefire-background);
     color: var(--slidefire-foreground);
     font-family: 'Roboto', sans-serif;
+    padding: 2rem 0;
 }
 
-/* WooCommerce Form Styling */
+.slidefire-product-customizer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ProductPage-style layout for widget */
+.slidefire-product-customizer .product-customizer-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .slidefire-product-customizer .product-customizer-wrapper {
+        flex-direction: row;
+        gap: 3rem;
+    }
+}
+
+/* WooCommerce Form Styling - ProductPage Layout */
 .slidefire-product-customizer form.cart {
     display: block !important;
+    width: 100%;
 }
 
 .slidefire-product-customizer .e-atc-qty-button-holder {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
     gap: 1rem;
 }
 
+/* Jersey Customization Section - Matching ProductPage */
+.slidefire-product-customizer .customization-section {
+    padding: 1rem;
+    background-color: rgba(var(--slidefire-card), 0.5);
+    border: 1px solid var(--slidefire-border);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .customization-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: var(--slidefire-primary);
+}
+
+.slidefire-product-customizer .customization-header .icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+.slidefire-product-customizer .customization-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .slidefire-product-customizer .customization-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Buttons - Matching ProductPage Design */
 .slidefire-product-customizer .single_add_to_cart_button {
     background-color: var(--slidefire-primary) !important;
     color: var(--slidefire-primary-foreground) !important;
@@ -44,15 +102,76 @@
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
+    width: 100% !important;
+    font-size: 1rem !important;
+    min-height: 2.75rem !important;
 }
 
 .slidefire-product-customizer .single_add_to_cart_button:hover {
-    background-color: #1e9fdb !important;
+    background-color: rgba(35, 178, 238, 0.9) !important;
 }
 
 .slidefire-product-customizer .single_add_to_cart_button:disabled {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
+}
+
+/* Buy Now Button - ProductPage Style */
+.slidefire-product-customizer .buy-now-button {
+    background-color: transparent !important;
+    color: var(--slidefire-primary) !important;
+    border: 1px solid var(--slidefire-primary) !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    font-size: 1rem !important;
+    min-height: 2.75rem !important;
+    margin-top: 1rem !important;
+}
+
+.slidefire-product-customizer .buy-now-button:hover {
+    background-color: rgba(35, 178, 238, 0.1) !important;
+}
+
+/* Wishlist Button - ProductPage Style */
+.slidefire-product-customizer .wishlist-button {
+    background-color: transparent !important;
+    color: var(--slidefire-foreground) !important;
+    border: 1px solid var(--slidefire-border) !important;
+    padding: 0.75rem !important;
+    border-radius: 0.375rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 3rem !important;
+    height: 2.75rem !important;
+    margin-left: 1rem !important;
+}
+
+.slidefire-product-customizer .wishlist-button:hover {
+    border-color: var(--slidefire-primary) !important;
+    color: var(--slidefire-primary) !important;
+}
+
+/* Button Layout - ProductPage Style */
+.slidefire-product-customizer .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .button-group .single_add_to_cart_button {
+    flex: 1;
+    margin: 0 !important;
 }
 
 /* Size Section */
@@ -569,12 +688,23 @@
 
 /* WCPA (Product Addons) Integration Styles */
 .slidefire-product-customizer .wcpa_form_outer {
-    margin: 1rem 0;
+    margin: 0 0 1rem 0;
     width: 100%;
-    background-color: var(--slidefire-card);
+    background-color: rgba(17, 17, 17, 0.5) !important;
     border-radius: 0.5rem;
     padding: 1rem;
     border: 1px solid var(--slidefire-border);
+    position: relative;
+}
+
+/* Add Jersey Customization header */
+.slidefire-product-customizer .wcpa_form_outer::before {
+    content: "🎽 Jersey Customization";
+    display: block;
+    font-weight: 500;
+    color: var(--slidefire-primary);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
 }
 
 .slidefire-product-customizer .wcpa_wrap {
@@ -595,6 +725,14 @@
     border-radius: 0.375rem !important;
     padding: 0.75rem !important;
     width: 100% !important;
+    height: 2.75rem !important;
+    box-sizing: border-box !important;
+    font-size: 0.875rem !important;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+.slidefire-product-customizer .wcpa_field::placeholder {
+    color: var(--slidefire-muted-foreground) !important;
 }
 
 .slidefire-product-customizer .wcpa_field:focus {
@@ -614,19 +752,120 @@
 }
 
 .slidefire-product-customizer .wcpa_row {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
     gap: 1rem !important;
-}
-
-.slidefire-product-customizer .wcpa-col-6 {
-    flex: 1 1 100%;
+    margin-bottom: 1rem !important;
 }
 
 @media (min-width: 768px) {
-    .slidefire-product-customizer .wcpa-col-6 {
-        flex: 1 1 calc(50% - 0.5rem);
+    .slidefire-product-customizer .wcpa_row {
+        grid-template-columns: 1fr 1fr !important;
     }
+}
+
+.slidefire-product-customizer .wcpa-col-6 {
+    width: 100% !important;
+}
+
+/* Add help text at bottom */
+.slidefire-product-customizer .wcpa_form_outer::after {
+    content: "# If no name or number is needed, please leave them blank";
+    display: block;
+    font-size: 0.75rem;
+    color: var(--slidefire-muted-foreground);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--slidefire-border);
+}
+
+/* Actions Section - ProductPage Style */
+.slidefire-product-customizer .actions-section {
+    margin-top: 1.5rem;
+}
+
+.slidefire-product-customizer .actions-section .space-y-4 > * + * {
+    margin-top: 1rem;
+}
+
+.slidefire-product-customizer .actions-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .actions-row .single_add_to_cart_button {
+    flex: 1;
+}
+
+/* Override WooCommerce variations styling */
+.slidefire-product-customizer .variations {
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .variations .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--slidefire-foreground);
+}
+
+.slidefire-product-customizer .variations select {
+    width: 100% !important;
+    background-color: var(--slidefire-input-background) !important;
+    border: 1px solid var(--slidefire-border) !important;
+    color: var(--slidefire-foreground) !important;
+    padding: 0.75rem !important;
+    border-radius: 0.375rem !important;
+    font-size: 0.875rem !important;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+    height: 2.75rem !important;
+    box-sizing: border-box !important;
+}
+
+.slidefire-product-customizer .variations select:focus {
+    outline: none !important;
+    border-color: var(--slidefire-primary) !important;
+    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+}
+
+/* Spacing improvements */
+.slidefire-product-customizer .product-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive layout improvements */
+@media (min-width: 1024px) {
+    .slidefire-product-customizer .product-customizer-wrapper {
+        max-width: 600px;
+    }
+}
+
+/* Loading states */
+.slidefire-product-customizer .single_add_to_cart_button.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.slidefire-product-customizer .single_add_to_cart_button.loading::after {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Custom field styling */
