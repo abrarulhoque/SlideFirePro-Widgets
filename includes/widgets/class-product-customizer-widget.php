@@ -52,78 +52,12 @@ class Product_Customizer_Widget extends Widget_Base {
         );
 
         $this->add_control(
-            'enable_variations',
+            'woocommerce_integration_info',
             [
-                'label' => esc_html__('Show Variations', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'slidefirePro-widgets'),
-                'label_off' => esc_html__('Hide', 'slidefirePro-widgets'),
-                'return_value' => 'yes',
-                'default' => 'yes',
-            ]
-        );
-
-        $this->add_control(
-            'customization_info',
-            [
-                'label' => esc_html__('Product Customization', 'slidefirePro-widgets'),
+                'label' => esc_html__('WooCommerce Integration', 'slidefirePro-widgets'),
                 'type' => Controls_Manager::RAW_HTML,
-                'raw' => esc_html__('Product customization fields (like name and number) are automatically handled by the WooCommerce Custom Product Addons plugin and will appear dynamically based on your product configuration.', 'slidefirePro-widgets'),
+                'raw' => esc_html__('This widget uses the native WooCommerce add to cart template, which automatically supports product variations, addons, and any plugin that hooks into WooCommerce forms (like Custom Product Addons, Product Bundles, etc.).', 'slidefirePro-widgets'),
                 'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
-            ]
-        );
-
-        $this->add_control(
-            'add_to_cart_text',
-            [
-                'label' => esc_html__('Add to Cart Text', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Add to Cart', 'slidefirePro-widgets'),
-            ]
-        );
-
-        $this->add_control(
-            'buy_now_text',
-            [
-                'label' => esc_html__('Buy Now Text', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Buy Now', 'slidefirePro-widgets'),
-            ]
-        );
-
-        $this->add_control(
-            'enable_quantity',
-            [
-                'label' => esc_html__('Show Quantity Field', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'slidefirePro-widgets'),
-                'label_off' => esc_html__('Hide', 'slidefirePro-widgets'),
-                'return_value' => 'yes',
-                'default' => 'yes',
-            ]
-        );
-
-        $this->add_control(
-            'quantity_label',
-            [
-                'label' => esc_html__('Quantity Label', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::TEXT,
-                'default' => esc_html__('Quantity', 'slidefirePro-widgets'),
-                'condition' => [
-                    'enable_quantity' => 'yes',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'enable_buy_now',
-            [
-                'label' => esc_html__('Show Buy Now Button', 'slidefirePro-widgets'),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__('Show', 'slidefirePro-widgets'),
-                'label_off' => esc_html__('Hide', 'slidefirePro-widgets'),
-                'return_value' => 'yes',
-                'default' => 'yes',
             ]
         );
 
@@ -528,167 +462,40 @@ class Product_Customizer_Widget extends Widget_Base {
 
         $settings = $this->get_settings_for_display();
 
-        // Add WooCommerce hooks for proper add to cart functionality
+        // Add WooCommerce hooks for proper add to cart functionality (same as Elementor Pro)
         add_action('woocommerce_before_add_to_cart_quantity', [$this, 'before_add_to_cart_quantity'], 95);
         add_action('woocommerce_before_add_to_cart_button', [$this, 'before_add_to_cart_quantity'], 5);
         add_action('woocommerce_after_add_to_cart_button', [$this, 'after_add_to_cart_button'], 5);
-
         ?>
-        <div class="slidefire-product-customizer elementor-add-to-cart elementor-product-<?php echo esc_attr($product->get_type()); ?>" data-product-id="<?php echo esc_attr($product->get_id()); ?>" data-product-type="<?php echo esc_attr($product->get_type()); ?>">
-            
-            <!-- Use native WooCommerce form for proper functionality -->
-            <form class="cart" method="post" enctype="multipart/form-data">
-                <?php do_action('woocommerce_before_add_to_cart_form'); ?>
 
-                <?php if ($settings['enable_variations'] === 'yes' && $product->is_type('variable')) : ?>
-                    <!-- Variations Section -->
-                    <div class="variations-section mb-4">
-                        <label class="block text-sm font-medium mb-2"><?php esc_html_e('Options', 'slidefirePro-widgets'); ?></label>
-                        <?php
-                        $available_variations = $product->get_available_variations();
-                        $attributes = $product->get_variation_attributes();
-                        
-                        if (!empty($available_variations) && !empty($attributes)) {
-                            foreach ($attributes as $attribute_name => $options) {
-                                $sanitized_name = sanitize_title($attribute_name);
-                                ?>
-                                <div class="variation-selector mb-3">
-                                    <label for="<?php echo esc_attr($sanitized_name); ?>" class="block text-sm mb-1">
-                                        <?php echo wc_attribute_label($attribute_name); ?>
-                                    </label>
-                                    <select 
-                                        id="<?php echo esc_attr($sanitized_name); ?>" 
-                                        name="attribute_<?php echo esc_attr($sanitized_name); ?>" 
-                                        class="customization-input variation-select" 
-                                        data-attribute_name="attribute_<?php echo esc_attr($sanitized_name); ?>"
-                                    >
-                                        <option value=""><?php echo esc_html__('Choose an option', 'slidefirePro-widgets'); ?></option>
-                                        <?php
-                                        if (!empty($options)) {
-                                            if (taxonomy_exists($attribute_name)) {
-                                                $terms = wc_get_product_terms($product->get_id(), $attribute_name, array('fields' => 'all'));
-                                                foreach ($terms as $term) {
-                                                    if (in_array($term->slug, $options, true)) {
-                                                        echo '<option value="' . esc_attr($term->slug) . '">' . esc_html(apply_filters('woocommerce_variation_option_name', $term->name, $term, $attribute_name, $product)) . '</option>';
-                                                    }
-                                                }
-                                            } else {
-                                                foreach ($options as $option) {
-                                                    echo '<option value="' . esc_attr($option) . '">' . esc_html(apply_filters('woocommerce_variation_option_name', $option, null, $attribute_name, $product)) . '</option>';
-                                                }
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <?php
-                            }
-                        }
-                        ?>
-                        <div class="single_variation_wrap">
-                            <div class="woocommerce-variation single_variation" style="display:none;"></div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <?php
-                // Let WCPA plugin render its fields naturally through WooCommerce hooks
-                // This will automatically render WCPA fields if they exist for this product
-                // The WCPA plugin hooks into 'woocommerce_before_add_to_cart_button' by default
-                ?>
-
-                <?php if ($settings['enable_quantity'] === 'yes') : ?>
-                    <!-- Quantity Section -->
-                    <div class="quantity-section mb-4">
-                        <label class="block text-sm font-medium mb-2"><?php echo esc_html($settings['quantity_label']); ?></label>
-                        <div class="slidefire-quantity-wrapper">
-                            <button class="slidefire-quantity-btn slidefire-quantity-decrease" type="button" aria-label="<?php esc_attr_e('Decrease quantity', 'slidefirePro-widgets'); ?>">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
-                                </svg>
-                            </button>
-                            <?php
-                            $min_quantity = apply_filters('woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product);
-                            $max_quantity = apply_filters('woocommerce_quantity_input_max', $product->get_max_purchase_quantity(), $product);
-                            $input_value = $product->get_min_purchase_quantity();
-                            
-                            woocommerce_quantity_input(array(
-                                'min_value'   => $min_quantity,
-                                'max_value'   => $max_quantity,
-                                'input_value' => $input_value,
-                                'classes'     => array('input-text', 'qty', 'text', 'slidefire-quantity-field'),
-                                'step'        => 1
-                            ), $product);
-                            ?>
-                            <button class="slidefire-quantity-btn slidefire-quantity-increase" type="button" aria-label="<?php esc_attr_e('Increase quantity', 'slidefirePro-widgets'); ?>">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="12" y1="5" x2="12" y2="19"/>
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                <?php else : ?>
-                    <input type="hidden" name="quantity" value="1" />
-                <?php endif; ?>
-
-                <!-- Action Buttons Section -->
-                <div class="actions-section">
-                    <div class="button-group">
-                        <?php
-                        // Use WooCommerce's native add to cart button
-                        if ($product->is_type('variable')) {
-                            echo '<input type="hidden" name="add-to-cart" value="' . esc_attr($product->get_id()) . '" />';
-                            echo '<input type="hidden" name="product_id" value="' . esc_attr($product->get_id()) . '" />';
-                            echo '<input type="hidden" name="variation_id" class="variation_id" value="0" />';
-                        } else {
-                            echo '<input type="hidden" name="add-to-cart" value="' . esc_attr($product->get_id()) . '" />';
-                        }
-                        ?>
-                        
-                        <button type="submit" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>" class="slidefire-button add-to-cart-button single_add_to_cart_button button alt">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
-                                <circle cx="8" cy="21" r="1"/>
-                                <circle cx="19" cy="21" r="1"/>
-                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-                            </svg>
-                            <span class="button-text"><?php echo esc_html($settings['add_to_cart_text']); ?></span>
-                        </button>
-                        
-                        <button type="button" class="wishlist-button slidefire-button" aria-label="<?php esc_attr_e('Add to wishlist', 'slidefirePro-widgets'); ?>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <?php if ($settings['enable_buy_now'] === 'yes') : ?>
-                        <button type="button" class="slidefire-button buy-now-button">
-                            <?php echo esc_html($settings['buy_now_text']); ?>
-                        </button>
-                    <?php endif; ?>
-                </div>
-
-                <?php do_action('woocommerce_after_add_to_cart_form'); ?>
-            </form>
+        <div class="slidefire-product-customizer elementor-add-to-cart elementor-product-<?php echo esc_attr($product->get_type()); ?>">
+            <?php 
+            // Use the same approach as Elementor Pro - call the native WooCommerce template
+            // This automatically triggers all WooCommerce hooks including those used by product addon plugins
+            woocommerce_template_single_add_to_cart();
+            ?>
         </div>
-        <?php
 
-        // Remove hooks after rendering
+        <?php
+        // Remove hooks after rendering (same as Elementor Pro)
         remove_action('woocommerce_before_add_to_cart_quantity', [$this, 'before_add_to_cart_quantity'], 95);
         remove_action('woocommerce_before_add_to_cart_button', [$this, 'before_add_to_cart_quantity'], 5);
         remove_action('woocommerce_after_add_to_cart_button', [$this, 'after_add_to_cart_button'], 5);
     }
 
     /**
-     * Hook callbacks for proper WooCommerce integration
+     * Hook callbacks for proper WooCommerce integration (same as Elementor Pro)
      */
     public function before_add_to_cart_quantity() {
-        echo '<div class="e-atc-qty-button-holder">';
+        ?>
+        <div class="e-atc-qty-button-holder">
+        <?php
     }
 
     public function after_add_to_cart_button() {
-        echo '</div>';
+        ?>
+        </div>
+        <?php
     }
 
     /**

@@ -13,10 +13,46 @@
     --slidefire-muted-foreground: #888888;
 }
 
-/* Main Container */
+/* Main Container - Native WooCommerce Integration */
 .slidefire-product-customizer {
     color: var(--slidefire-foreground);
     font-family: 'Roboto', sans-serif;
+}
+
+/* WooCommerce Form Styling */
+.slidefire-product-customizer form.cart {
+    display: block !important;
+}
+
+.slidefire-product-customizer .e-atc-qty-button-holder {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.slidefire-product-customizer .single_add_to_cart_button {
+    background-color: var(--slidefire-primary) !important;
+    color: var(--slidefire-primary-foreground) !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+}
+
+.slidefire-product-customizer .single_add_to_cart_button:hover {
+    background-color: #1e9fdb !important;
+}
+
+.slidefire-product-customizer .single_add_to_cart_button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
 }
 
 /* Size Section */
@@ -472,13 +508,73 @@
     display: none !important;
 }
 
-/* WCPA Integration Styles */
+/* Native WooCommerce Quantity Input */
+.slidefire-product-customizer .quantity {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .quantity .qty {
+    background-color: var(--slidefire-input-background) !important;
+    border: 1px solid var(--slidefire-border) !important;
+    color: var(--slidefire-foreground) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem !important;
+    text-align: center !important;
+    width: 80px !important;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+.slidefire-product-customizer .quantity .qty:focus {
+    border-color: var(--slidefire-primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+}
+
+/* Hide quantity input arrows */
+.slidefire-product-customizer .quantity .qty::-webkit-outer-spin-button,
+.slidefire-product-customizer .quantity .qty::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* WooCommerce Variations Styling */
+.slidefire-product-customizer .variations {
+    margin-bottom: 1rem;
+}
+
+.slidefire-product-customizer .variations select {
+    background-color: var(--slidefire-input-background) !important;
+    border: 1px solid var(--slidefire-border) !important;
+    color: var(--slidefire-foreground) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem !important;
+    width: 100% !important;
+}
+
+.slidefire-product-customizer .variations select:focus {
+    border-color: var(--slidefire-primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+}
+
+.slidefire-product-customizer .variations .label {
+    color: var(--slidefire-foreground) !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
+}
+
+/* WCPA (Product Addons) Integration Styles */
 .slidefire-product-customizer .wcpa_form_outer {
     margin: 1rem 0;
     width: 100%;
     background-color: var(--slidefire-card);
     border-radius: 0.5rem;
     padding: 1rem;
+    border: 1px solid var(--slidefire-border);
 }
 
 .slidefire-product-customizer .wcpa_wrap {
@@ -487,8 +583,9 @@
 
 .slidefire-product-customizer .wcpa_field_label {
     color: var(--slidefire-foreground) !important;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
+    font-weight: 500 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.875rem !important;
 }
 
 .slidefire-product-customizer .wcpa_field {
@@ -497,11 +594,13 @@
     color: var(--slidefire-foreground) !important;
     border-radius: 0.375rem !important;
     padding: 0.75rem !important;
+    width: 100% !important;
 }
 
 .slidefire-product-customizer .wcpa_field:focus {
     border-color: var(--slidefire-primary) !important;
     box-shadow: 0 0 0 3px rgba(35, 178, 238, 0.1) !important;
+    outline: none !important;
 }
 
 .slidefire-product-customizer .wcpa_field_desc {
@@ -518,6 +617,16 @@
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 1rem !important;
+}
+
+.slidefire-product-customizer .wcpa-col-6 {
+    flex: 1 1 100%;
+}
+
+@media (min-width: 768px) {
+    .slidefire-product-customizer .wcpa-col-6 {
+        flex: 1 1 calc(50% - 0.5rem);
+    }
 }
 
 /* Custom field styling */
