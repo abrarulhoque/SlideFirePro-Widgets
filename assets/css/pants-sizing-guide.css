@@ -1,0 +1,325 @@
+/* Pants Sizing Guide Widget CSS */
+
+.slidefire-pants-sizing-guide-wrapper {
+    margin-top: 3rem;
+}
+
+.pants-sizing-guide-card {
+    padding: 2rem;
+    background-color: var(--card, #111111);
+    border: 1px solid var(--border, #333333);
+    border-radius: 0.5rem;
+}
+
+.pants-sizing-guide-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.pants-sizing-guide-title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.pants-sizing-guide-icon {
+    height: 1.5rem;
+    width: 1.5rem;
+    color: var(--primary, #23B2EE);
+    flex-shrink: 0;
+}
+
+.pants-sizing-guide-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--foreground, #ffffff);
+}
+
+.pants-sizing-guide-description {
+    color: var(--muted-foreground, #888888);
+    max-width: 42rem;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.pants-sizing-guide-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .pants-sizing-guide-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Measurement Section */
+.pants-measurement-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pants-measurement-diagram {
+    background: linear-gradient(to bottom right, rgba(34, 34, 34, 0.2), var(--background, #000000));
+    border-radius: 0.75rem;
+    padding: 2rem;
+    position: relative;
+}
+
+.pants-diagram-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.pants-measurement-badge {
+    background-color: rgba(35, 178, 238, 0.1);
+    color: var(--primary, #23B2EE);
+    border: 1px solid rgba(35, 178, 238, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.pants-diagram {
+    position: relative;
+    margin: 0 auto;
+    width: 16rem;
+    height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pants-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.pants-measurement-label {
+    fill: var(--primary, #23B2EE);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--body-font, 'Roboto', sans-serif);
+}
+
+.pants-measurement-notes {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground, #888888);
+}
+
+.pants-measurement-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pants-info-icon {
+    color: var(--primary, #23B2EE);
+    flex-shrink: 0;
+}
+
+/* Sizing Table Section */
+.pants-sizing-table-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pants-sizing-table-wrapper {
+    background: linear-gradient(to right, rgba(35, 178, 238, 0.05), rgba(59, 130, 246, 0.05));
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+}
+
+.pants-sizing-table-card {
+    background-color: var(--card, #111111);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.pants-sizing-table-header {
+    background-color: rgba(35, 178, 238, 0.1);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border, #333333);
+}
+
+.pants-sizing-table-title {
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+    color: var(--foreground, #ffffff);
+}
+
+.pants-sizing-table-container {
+    overflow-x: auto;
+}
+
+.pants-sizing-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+}
+
+.pants-sizing-table thead tr {
+    background-color: rgba(34, 34, 34, 0.2);
+    border-bottom: 1px solid var(--border, #333333);
+}
+
+.pants-sizing-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--foreground, #ffffff);
+}
+
+.pants-sizing-table th:first-child {
+    text-align: left;
+}
+
+.pants-sizing-table th:not(:first-child) {
+    text-align: center;
+}
+
+.pants-sizing-table tbody tr {
+    border-bottom: 1px solid rgba(51, 51, 51, 0.5);
+    transition: background-color 0.2s ease;
+}
+
+.pants-sizing-table tbody tr:hover {
+    background-color: rgba(35, 178, 238, 0.05);
+}
+
+.pants-even-row {
+    background-color: rgba(34, 34, 34, 0.1);
+}
+
+.pants-odd-row {
+    background-color: transparent;
+}
+
+.pants-sizing-table td {
+    padding: 1rem;
+}
+
+.pants-size-badge {
+    background-color: transparent;
+    border: 1px solid var(--border, #333333);
+    color: var(--foreground, #ffffff);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+.pants-measurement-value {
+    text-align: center;
+    font-weight: 500;
+    color: var(--foreground, #ffffff);
+}
+
+/* Fitting Tips */
+.pants-fitting-tips-card {
+    padding: 1rem;
+    background-color: rgba(35, 178, 238, 0.05);
+    border: 1px solid rgba(35, 178, 238, 0.2);
+    border-radius: 0.5rem;
+}
+
+.pants-fitting-tips-title {
+    font-weight: 600;
+    color: var(--primary, #23B2EE);
+    margin: 0 0 0.75rem 0;
+    font-size: 1.125rem;
+}
+
+.pants-fitting-tips-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pants-fitting-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground, #888888);
+    line-height: 1.5;
+}
+
+.pants-tip-bullet {
+    width: 0.375rem;
+    height: 0.375rem;
+    background-color: var(--primary, #23B2EE);
+    border-radius: 50%;
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pants-sizing-guide-card {
+        padding: 1.5rem;
+    }
+    
+    .pants-sizing-guide-content {
+        gap: 2rem;
+    }
+    
+    .pants-measurement-diagram {
+        padding: 1.5rem;
+    }
+    
+    .pants-diagram {
+        width: 14rem;
+        height: 18rem;
+    }
+    
+    .pants-sizing-table th,
+    .pants-sizing-table td {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pants-sizing-guide-title {
+        font-size: 1.25rem;
+    }
+    
+    .pants-sizing-table-container {
+        font-size: 0.8rem;
+    }
+    
+    .pants-sizing-table th,
+    .pants-sizing-table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Dark theme specific adjustments */
+@media (prefers-color-scheme: dark) {
+    .pants-sizing-guide-card {
+        background-color: var(--card, #111111);
+        border-color: var(--border, #333333);
+    }
+    
+    .pants-measurement-diagram {
+        background: linear-gradient(to bottom right, rgba(34, 34, 34, 0.3), var(--background, #000000));
+    }
+}
