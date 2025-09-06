@@ -191,8 +191,9 @@ class WooCommerce_Product_Fields {
         ];
 
         foreach ( $shipping_fields as $field ) {
-            if ( isset( $_POST[ str_replace( '_', '', $field ) ] ) ) {
-                $value = sanitize_text_field( $_POST[ str_replace( '_', '', $field ) ] );
+            // Field IDs are used as the POST keys by woocommerce_wp_text_input
+            if ( isset( $_POST[ $field ] ) ) {
+                $value = sanitize_text_field( $_POST[ $field ] );
                 update_post_meta( $post_id, $field, $value );
             }
         }
