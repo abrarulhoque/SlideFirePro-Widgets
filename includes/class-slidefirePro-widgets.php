@@ -230,6 +230,14 @@ class SlideFirePro_Widgets {
             '1.27.0',
             true
         );
+
+        // Register WC product info assets
+        wp_register_style(
+            'slidefire-wc-product-info-widget',
+            SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-product-info-widget.css',
+            [],
+            '1.33.0'
+        );
 		
 		// Localize script for AJAX
 		$ajax_data = [
@@ -268,6 +276,7 @@ class SlideFirePro_Widgets {
 		require_once( __DIR__. '/../widgets/class-returns-policy-widget.php' );
 		require_once( __DIR__. '/widgets/class-cart-drawer-widget.php' );
 		require_once( __DIR__. '/../widgets/class-contact-page-widget.php' );
+		require_once( __DIR__. '/../widgets/class-wc-product-info-widget.php' );
 
 		// Register the widget classes.
 		$widgets_manager->register( new Widgets\Category_Filter_Widget() );
@@ -287,6 +296,8 @@ class SlideFirePro_Widgets {
 			$widgets_manager->register( new \SlideFirePro_Returns_Policy_Widget() );
 			// Contact Page widget is defined in the global namespace.
 			$widgets_manager->register( new \SlideFirePro_Contact_Page_Widget() );
+			// WC Product Info widget is defined in the global namespace.
+			$widgets_manager->register( new \SlideFirePro_WC_Product_Info_Widget() );
 	}
 
     /**
