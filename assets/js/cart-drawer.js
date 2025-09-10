@@ -140,6 +140,9 @@
             
             this.showLoading();
             
+            // Get widget settings from the widget element
+            var settings = this.getWidgetSettings();
+            
             // Get fresh cart content via AJAX
             $.ajax({
                 url: slideFireProCartAjax.ajax_url,
@@ -147,7 +150,8 @@
                 data: {
                     action: 'slidefire_get_cart_content',
                     nonce: slideFireProCartAjax.nonce,
-                    widget_id: this.widgetId
+                    widget_id: this.widgetId,
+                    settings: settings
                 },
                 success: function(response) {
                     if (response.success) {
@@ -171,6 +175,35 @@
                     self.hideLoading();
                 }
             });
+        },
+
+        getWidgetSettings: function() {
+            // Extract settings from data attributes or hidden elements in the widget
+            var $widget = this.$element;
+            var settings = {};
+            
+            // Check for data attributes on the wrapper or content
+            var $content = $widget.find('.slidefire-cart-drawer-content');
+            
+            // Default settings - these will be used if no widget settings are found
+            settings.show_shipping_message = 'yes';
+            settings.shipping_message_text = 'Shipping calculated at checkout';
+            settings.show_tax_message = 'yes';
+            settings.tax_message_text = 'Tax calculated at checkout';
+            settings.checkout_button_text = 'Proceed to Checkout';
+            settings.continue_shopping_text = 'Continue Shopping';
+            
+            // Try to get settings from data attributes if they exist
+            if ($content.length) {
+                settings.show_shipping_message = $content.data('show-shipping-message') || settings.show_shipping_message;
+                settings.shipping_message_text = $content.data('shipping-message-text') || settings.shipping_message_text;
+                settings.show_tax_message = $content.data('show-tax-message') || settings.show_tax_message;
+                settings.tax_message_text = $content.data('tax-message-text') || settings.tax_message_text;
+                settings.checkout_button_text = $content.data('checkout-button-text') || settings.checkout_button_text;
+                settings.continue_shopping_text = $content.data('continue-shopping-text') || settings.continue_shopping_text;
+            }
+            
+            return settings;
         },
 
         updateQuantity: function(cartItemKey, quantity, $quantityEl) {

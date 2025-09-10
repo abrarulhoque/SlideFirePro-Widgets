@@ -1084,9 +1084,21 @@ class SlideFirePro_Widgets {
 		}
 
 		$widget_id = isset( $_POST['widget_id'] ) ? sanitize_text_field( $_POST['widget_id'] ) : '';
+		$settings = isset( $_POST['settings'] ) ? $_POST['settings'] : [];
+
+		// Sanitize settings
+		$clean_settings = [];
+		if ( is_array( $settings ) ) {
+			$clean_settings['show_shipping_message'] = sanitize_text_field( $settings['show_shipping_message'] ?? 'yes' );
+			$clean_settings['shipping_message_text'] = sanitize_text_field( $settings['shipping_message_text'] ?? 'Shipping calculated at checkout' );
+			$clean_settings['show_tax_message'] = sanitize_text_field( $settings['show_tax_message'] ?? 'yes' );
+			$clean_settings['tax_message_text'] = sanitize_text_field( $settings['tax_message_text'] ?? 'Tax calculated at checkout' );
+			$clean_settings['checkout_button_text'] = sanitize_text_field( $settings['checkout_button_text'] ?? 'Proceed to Checkout' );
+			$clean_settings['continue_shopping_text'] = sanitize_text_field( $settings['continue_shopping_text'] ?? 'Continue Shopping' );
+		}
 
 		// Generate cart content HTML
-		$content = $this->generate_cart_content();
+		$content = $this->generate_cart_content( $clean_settings );
 		$cart_count = WC()->cart->get_cart_contents_count();
 
 		wp_send_json_success( [
@@ -1172,11 +1184,11 @@ class SlideFirePro_Widgets {
 	/**
 	 * Generate cart content HTML for AJAX responses
 	 */
-	private function generate_cart_content() {
+	private function generate_cart_content( $settings = [] ) {
 		if ( WC()->cart->is_empty() ) {
 			return $this->generate_empty_cart_content();
 		} else {
-			return $this->generate_cart_items_content() . $this->generate_cart_summary_content();
+			return $this->generate_cart_items_content() . $this->generate_cart_summary_content( $settings );
 		}
 	}
 
@@ -1291,15 +1303,21 @@ class SlideFirePro_Widgets {
 	/**
 	 * Generate cart summary content
 	 */
-	private function generate_cart_summary_content() {
+	private function generate_cart_summary_content( $settings = [] ) {
 		$cart = WC()->cart;
 		$subtotal = $cart->get_subtotal();
-		$tax_rate = 0.08; // Default 8% tax rate
-		$tax_amount = $subtotal * $tax_rate;
-		$free_shipping_threshold = 100;
-		$standard_shipping = 15;
-		$shipping_cost = $subtotal >= $free_shipping_threshold ? 0 : $standard_shipping;
-		$total = $subtotal + $tax_amount + $shipping_cost;
+
+		// Default settings for AJAX calls
+		if ( empty( $settings ) ) {
+			$settings = [
+				'show_shipping_message' => 'yes',
+				'shipping_message_text' => 'Shipping calculated at checkout',
+				'show_tax_message' => 'yes',
+				'tax_message_text' => 'Tax calculated at checkout',
+				'checkout_button_text' => 'Proceed to Checkout',
+				'continue_shopping_text' => 'Continue Shopping'
+			];
+		}
 
 		ob_start();
 		?>
@@ -1308,30 +1326,22 @@ class SlideFirePro_Widgets {
 				<span class="slidefire-summary-label"><?php esc_html_e( 'Subtotal', 'slidefirePro-widgets' ); ?></span>
 				<span class="slidefire-summary-value"><?php echo wc_price( $subtotal ); ?></span>
 			</div>
-			<div class="slidefire-summary-row">
-				<span class="slidefire-summary-label"><?php esc_html_e( 'Tax', 'slidefirePro-widgets' ); ?></span>
-				<span class="slidefire-summary-value"><?php echo wc_price( $tax_amount ); ?></span>
-			</div>
-			<div class="slidefire-summary-row">
-				<span class="slidefire-summary-label"><?php esc_html_e( 'Shipping', 'slidefirePro-widgets' ); ?></span>
-				<span class="slidefire-summary-value">
-					<?php if ( $shipping_cost > 0 ) : ?>
-						<?php echo wc_price( $shipping_cost ); ?>
-					<?php else : ?>
-						<span class="slidefire-free-shipping"><?php esc_html_e( 'Free', 'slidefirePro-widgets' ); ?></span>
-					<?php endif; ?>
-				</span>
-			</div>
 			
-			<?php if ( $subtotal < $free_shipping_threshold && $subtotal > 0 ) : ?>
-				<div class="slidefire-free-shipping-notice">
-					<?php 
-					$remaining = $free_shipping_threshold - $subtotal;
-					echo sprintf(
-						esc_html__( 'Add %s more for free shipping', 'slidefirePro-widgets' ),
-						wc_price( $remaining )
-					);
-					?>
+			<?php if ( 'yes' === $settings['show_shipping_message'] ) : ?>
+				<div class="slidefire-summary-row">
+					<span class="slidefire-summary-label"><?php esc_html_e( 'Shipping', 'slidefirePro-widgets' ); ?></span>
+					<span class="slidefire-summary-value slidefire-calculated-message">
+						<?php echo esc_html( $settings['shipping_message_text'] ); ?>
+					</span>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( 'yes' === $settings['show_tax_message'] ) : ?>
+				<div class="slidefire-summary-row">
+					<span class="slidefire-summary-label"><?php esc_html_e( 'Tax', 'slidefirePro-widgets' ); ?></span>
+					<span class="slidefire-summary-value slidefire-calculated-message">
+						<?php echo esc_html( $settings['tax_message_text'] ); ?>
+					</span>
 				</div>
 			<?php endif; ?>
 			
@@ -1339,19 +1349,19 @@ class SlideFirePro_Widgets {
 			
 			<div class="slidefire-summary-row slidefire-summary-total">
 				<span class="slidefire-summary-label"><?php esc_html_e( 'Total', 'slidefirePro-widgets' ); ?></span>
-				<span class="slidefire-summary-value slidefire-total-price"><?php echo wc_price( $total ); ?></span>
+				<span class="slidefire-summary-value slidefire-total-price"><?php echo wc_price( $subtotal ); ?></span>
 			</div>
 
 			<div class="slidefire-cart-actions">
 				<a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="slidefire-checkout-button">
-					<?php esc_html_e( 'Proceed to Checkout', 'slidefirePro-widgets' ); ?>
+					<?php echo esc_html( $settings['checkout_button_text'] ); ?>
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<line x1="5" y1="12" x2="19" y2="12"></line>
 						<polyline points="12,5 19,12 12,19"></polyline>
 					</svg>
 				</a>
 				<button class="slidefire-continue-shopping-button slidefire-close-drawer">
-					<?php esc_html_e( 'Continue Shopping', 'slidefirePro-widgets' ); ?>
+					<?php echo esc_html( $settings['continue_shopping_text'] ); ?>
 				</button>
 			</div>
 
@@ -1367,31 +1377,35 @@ class SlideFirePro_Widgets {
 	/**
 	 * Get cart totals for AJAX responses
 	 */
-	private function get_cart_totals() {
+	private function get_cart_totals( $settings = [] ) {
 		$cart = WC()->cart;
 		$subtotal = $cart->get_subtotal();
-		$tax_rate = 0.08; // Default 8% tax rate
-		$tax_amount = $subtotal * $tax_rate;
-		$free_shipping_threshold = 100;
-		$standard_shipping = 15;
-		$shipping_cost = $subtotal >= $free_shipping_threshold ? 0 : $standard_shipping;
-		$total = $subtotal + $tax_amount + $shipping_cost;
 
-		$shipping_display = $shipping_cost > 0 ? wc_price( $shipping_cost ) : '<span class="slidefire-free-shipping">' . esc_html__( 'Free', 'slidefirePro-widgets' ) . '</span>';
+		// Default settings for AJAX calls
+		if ( empty( $settings ) ) {
+			$settings = [
+				'show_shipping_message' => 'yes',
+				'shipping_message_text' => 'Shipping calculated at checkout',
+				'show_tax_message' => 'yes',
+				'tax_message_text' => 'Tax calculated at checkout'
+			];
+		}
 
-		return [
+		$totals = [
 			'subtotal' => wc_price( $subtotal ),
-			'tax' => wc_price( $tax_amount ),
-			'shipping' => $shipping_display,
-			'total' => wc_price( $total ),
-			'free_shipping_notice' => [
-				'show' => $subtotal < $free_shipping_threshold && $subtotal > 0,
-				'message' => sprintf(
-					esc_html__( 'Add %s more for free shipping', 'slidefirePro-widgets' ),
-					wc_price( $free_shipping_threshold - $subtotal )
-				)
-			]
+			'total' => wc_price( $subtotal )
 		];
+
+		// Add shipping and tax messages if enabled
+		if ( 'yes' === $settings['show_shipping_message'] ) {
+			$totals['shipping'] = $settings['shipping_message_text'];
+		}
+
+		if ( 'yes' === $settings['show_tax_message'] ) {
+			$totals['tax'] = $settings['tax_message_text'];
+		}
+
+		return $totals;
 	}
 }
 

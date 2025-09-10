@@ -545,7 +545,13 @@ class Cart_Drawer_Widget extends Widget_Base {
 
             <!-- Cart Drawer -->
             <div class="slidefire-cart-drawer" id="slidefire-cart-drawer-<?php echo esc_attr( $this->get_id() ); ?>">
-                <div class="slidefire-cart-drawer-content">
+                <div class="slidefire-cart-drawer-content"
+                     data-show-shipping-message="<?php echo esc_attr( $settings['show_shipping_message'] ); ?>"
+                     data-shipping-message-text="<?php echo esc_attr( $settings['shipping_message_text'] ); ?>"
+                     data-show-tax-message="<?php echo esc_attr( $settings['show_tax_message'] ); ?>"
+                     data-tax-message-text="<?php echo esc_attr( $settings['tax_message_text'] ); ?>"
+                     data-checkout-button-text="<?php echo esc_attr( $settings['checkout_button_text'] ); ?>"
+                     data-continue-shopping-text="<?php echo esc_attr( $settings['continue_shopping_text'] ); ?>">
                     <!-- Drawer Header -->
                     <div class="slidefire-cart-drawer-header">
                         <div class="slidefire-cart-drawer-title-wrapper">
