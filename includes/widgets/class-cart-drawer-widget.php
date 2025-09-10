@@ -176,44 +176,62 @@ class Cart_Drawer_Widget extends Widget_Base {
 
         $this->end_controls_section();
 
-        // Shipping Settings
+        // Checkout Messages
         $this->start_controls_section(
-            'section_shipping_settings',
+            'section_checkout_messages',
             [
-                'label' => esc_html__( 'Shipping Settings', 'slidefirePro-widgets' ),
+                'label' => esc_html__( 'Checkout Messages', 'slidefirePro-widgets' ),
                 'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
 
         $this->add_control(
-            'free_shipping_threshold',
+            'show_shipping_message',
             [
-                'label' => esc_html__( 'Free Shipping Threshold', 'slidefirePro-widgets' ),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 100,
-                'description' => esc_html__( 'Minimum order amount for free shipping', 'slidefirePro-widgets' ),
+                'label' => esc_html__( 'Show Shipping Message', 'slidefirePro-widgets' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'slidefirePro-widgets' ),
+                'label_off' => esc_html__( 'No', 'slidefirePro-widgets' ),
+                'return_value' => 'yes',
+                'default' => 'yes',
             ]
         );
 
         $this->add_control(
-            'standard_shipping_cost',
+            'shipping_message_text',
             [
-                'label' => esc_html__( 'Standard Shipping Cost', 'slidefirePro-widgets' ),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 15,
-                'description' => esc_html__( 'Standard shipping cost when below threshold', 'slidefirePro-widgets' ),
+                'label' => esc_html__( 'Shipping Message', 'slidefirePro-widgets' ),
+                'type' => Controls_Manager::TEXT,
+                'default' => esc_html__( 'Shipping calculated at checkout', 'slidefirePro-widgets' ),
+                'label_block' => true,
+                'condition' => [
+                    'show_shipping_message' => 'yes',
+                ],
             ]
         );
 
         $this->add_control(
-            'tax_rate',
+            'show_tax_message',
             [
-                'label' => esc_html__( 'Tax Rate (%)', 'slidefirePro-widgets' ),
-                'type' => Controls_Manager::NUMBER,
-                'default' => 8,
-                'min' => 0,
-                'max' => 100,
-                'step' => 0.1,
+                'label' => esc_html__( 'Show Tax Message', 'slidefirePro-widgets' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'slidefirePro-widgets' ),
+                'label_off' => esc_html__( 'No', 'slidefirePro-widgets' ),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'tax_message_text',
+            [
+                'label' => esc_html__( 'Tax Message', 'slidefirePro-widgets' ),
+                'type' => Controls_Manager::TEXT,
+                'default' => esc_html__( 'Tax calculated at checkout', 'slidefirePro-widgets' ),
+                'label_block' => true,
+                'condition' => [
+                    'show_tax_message' => 'yes',
+                ],
             ]
         );
 
@@ -710,44 +728,28 @@ class Cart_Drawer_Widget extends Widget_Base {
     private function render_cart_summary( $settings ) {
         $cart = WC()->cart;
         $subtotal = $cart->get_subtotal();
-        $tax_rate = floatval( $settings['tax_rate'] ) / 100;
-        $tax_amount = $subtotal * $tax_rate;
-        
-        $free_shipping_threshold = floatval( $settings['free_shipping_threshold'] );
-        $standard_shipping = floatval( $settings['standard_shipping_cost'] );
-        $shipping_cost = $subtotal >= $free_shipping_threshold ? 0 : $standard_shipping;
-        
-        $total = $subtotal + $tax_amount + $shipping_cost;
         ?>
         <div class="slidefire-cart-summary">
             <div class="slidefire-summary-row">
                 <span class="slidefire-summary-label"><?php esc_html_e( 'Subtotal', 'slidefirePro-widgets' ); ?></span>
                 <span class="slidefire-summary-value"><?php echo wc_price( $subtotal ); ?></span>
             </div>
-            <div class="slidefire-summary-row">
-                <span class="slidefire-summary-label"><?php esc_html_e( 'Tax', 'slidefirePro-widgets' ); ?></span>
-                <span class="slidefire-summary-value"><?php echo wc_price( $tax_amount ); ?></span>
-            </div>
-            <div class="slidefire-summary-row">
-                <span class="slidefire-summary-label"><?php esc_html_e( 'Shipping', 'slidefirePro-widgets' ); ?></span>
-                <span class="slidefire-summary-value">
-                    <?php if ( $shipping_cost > 0 ) : ?>
-                        <?php echo wc_price( $shipping_cost ); ?>
-                    <?php else : ?>
-                        <span class="slidefire-free-shipping"><?php esc_html_e( 'Free', 'slidefirePro-widgets' ); ?></span>
-                    <?php endif; ?>
-                </span>
-            </div>
             
-            <?php if ( $subtotal < $free_shipping_threshold && $subtotal > 0 ) : ?>
-                <div class="slidefire-free-shipping-notice">
-                    <?php 
-                    $remaining = $free_shipping_threshold - $subtotal;
-                    echo sprintf(
-                        esc_html__( 'Add %s more for free shipping', 'slidefirePro-widgets' ),
-                        wc_price( $remaining )
-                    );
-                    ?>
+            <?php if ( 'yes' === $settings['show_shipping_message'] ) : ?>
+                <div class="slidefire-summary-row">
+                    <span class="slidefire-summary-label"><?php esc_html_e( 'Shipping', 'slidefirePro-widgets' ); ?></span>
+                    <span class="slidefire-summary-value slidefire-calculated-message">
+                        <?php echo esc_html( $settings['shipping_message_text'] ); ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ( 'yes' === $settings['show_tax_message'] ) : ?>
+                <div class="slidefire-summary-row">
+                    <span class="slidefire-summary-label"><?php esc_html_e( 'Tax', 'slidefirePro-widgets' ); ?></span>
+                    <span class="slidefire-summary-value slidefire-calculated-message">
+                        <?php echo esc_html( $settings['tax_message_text'] ); ?>
+                    </span>
                 </div>
             <?php endif; ?>
             
@@ -755,7 +757,7 @@ class Cart_Drawer_Widget extends Widget_Base {
             
             <div class="slidefire-summary-row slidefire-summary-total">
                 <span class="slidefire-summary-label"><?php esc_html_e( 'Total', 'slidefirePro-widgets' ); ?></span>
-                <span class="slidefire-summary-value slidefire-total-price"><?php echo wc_price( $total ); ?></span>
+                <span class="slidefire-summary-value slidefire-total-price"><?php echo wc_price( $subtotal ); ?></span>
             </div>
 
             <div class="slidefire-cart-actions">

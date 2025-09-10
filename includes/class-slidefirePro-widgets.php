@@ -204,14 +204,14 @@ class SlideFirePro_Widgets {
             'slidefire-cart-drawer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/css/cart-drawer.css',
             [],
-            '1.27.0'
+            '1.35.0'
         );
 
         wp_register_script(
             'slidefire-cart-drawer',
             SLIDEFIREPRO_WIDGETS_URL . 'assets/js/cart-drawer.js',
             [ 'jquery', 'elementor-frontend' ],
-            '1.27.0',
+            '1.35.0',
             true
         );
 
