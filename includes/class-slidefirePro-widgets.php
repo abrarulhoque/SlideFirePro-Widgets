@@ -72,20 +72,20 @@ class SlideFirePro_Widgets {
         );
 		
 		// Register WC products assets
-		wp_register_style(
-			'slidefirePro-wc-products',
-			SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
-			[],
-            '1.25.0'
-        );
-		
-		wp_register_script(
-			'slidefirePro-wc-products',
-			SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
-			[ 'jquery', 'elementor-frontend' ],
-            '1.25.0',
-            true
-        );
+                wp_register_style(
+                        'slidefirePro-wc-products',
+                        SLIDEFIREPRO_WIDGETS_URL . 'assets/css/wc-products.css',
+                        [],
+                        SLIDEFIREPRO_WIDGETS_VERSION
+                );
+
+                wp_register_script(
+                        'slidefirePro-wc-products',
+                        SLIDEFIREPRO_WIDGETS_URL . 'assets/js/wc-products.js',
+                        [ 'jquery', 'elementor-frontend' ],
+                        SLIDEFIREPRO_WIDGETS_VERSION,
+                        true
+                );
 
 		// Register header navigation assets
 		wp_register_style(
