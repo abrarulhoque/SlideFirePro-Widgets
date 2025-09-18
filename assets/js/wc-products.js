@@ -52,6 +52,7 @@
             const productId = button.data('product-id');
             const productType = button.data('product-type');
             const productUrl = button.data('product-url');
+            const quantity = parseInt(button.data('quantity'), 10) || 1;
 
             // For variable products (need option selection), go to product page
             if (productType === 'variable' && productUrl) {
@@ -85,6 +86,7 @@
                 data: {
                     action: 'slidefirePro_add_to_cart',
                     product_id: productId,
+                    quantity,
                     nonce: slideFireProAjax.nonce
                 },
                 success: (response) => {
