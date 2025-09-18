@@ -136,17 +136,31 @@ class WC_Products_Widget extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
-			'quick_add_text',
-			[
-				'label' => esc_html__( 'Quick Add Text', 'slidefirePro-widgets' ),
-				'type' => Controls_Manager::TEXT,
-				'default' => esc_html__( 'Quick Add', 'slidefirePro-widgets' ),
-				'condition' => [
-					'show_quick_add_button' => 'yes',
-				],
-			]
-		);
+                $this->add_control(
+                        'quick_add_text',
+                        [
+                                'label' => esc_html__( 'Quick Add Text', 'slidefirePro-widgets' ),
+                                'type' => Controls_Manager::TEXT,
+                                'default' => esc_html__( 'Quick Add', 'slidefirePro-widgets' ),
+                                'condition' => [
+                                        'show_quick_add_button' => 'yes',
+                                ],
+                        ]
+                );
+
+                $this->add_control(
+                        'quick_add_quantity',
+                        [
+                                'label' => esc_html__( 'Quick Add Quantity', 'slidefirePro-widgets' ),
+                                'type' => Controls_Manager::NUMBER,
+                                'default' => 3,
+                                'min' => 1,
+                                'step' => 1,
+                                'condition' => [
+                                        'show_quick_add_button' => 'yes',
+                                ],
+                        ]
+                );
 
 		$this->add_control(
 			'show_load_more',
@@ -523,7 +537,9 @@ class WC_Products_Widget extends Widget_Base {
 			return '<div class="slidefirePro-no-products">' . esc_html__( 'No products found.', 'slidefirePro-widgets' ) . '</div>';
 		}
 
-		ob_start();
+                $quick_add_quantity = max( 1, (int) ( $settings['quick_add_quantity'] ?? 3 ) );
+
+                ob_start();
 		?>
 		<div class="slidefirePro-products-grid">
 			<?php
@@ -558,10 +574,11 @@ class WC_Products_Widget extends Widget_Base {
 							?>
 							<button 
 								class="quick-add-button" 
-								data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
-								data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
-								data-product-url="<?php echo esc_url( get_permalink() ); ?>"
-							>
+                                                                data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
+                                                                data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+                                                                data-product-url="<?php echo esc_url( get_permalink() ); ?>"
+                                                                data-quantity="<?php echo esc_attr( $quick_add_quantity ); ?>"
+                                                        >
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
 									<circle cx="8" cy="21" r="1"></circle>
 									<circle cx="19" cy="21" r="1"></circle>

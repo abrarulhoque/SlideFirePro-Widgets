@@ -519,8 +519,8 @@ class SlideFirePro_Widgets {
 			wp_send_json_error( [ 'message' => 'WooCommerce is not active' ] );
 		}
 
-		$product_id = intval( $_POST['product_id'] ?? 0 );
-		$quantity = intval( $_POST['quantity'] ?? 1 );
+                $product_id = intval( $_POST['product_id'] ?? 0 );
+                $quantity = max( 1, intval( $_POST['quantity'] ?? 1 ) );
 
 		if ( ! $product_id ) {
 			wp_send_json_error( [ 'message' => 'Invalid product ID' ] );
@@ -577,9 +577,9 @@ class SlideFirePro_Widgets {
 				$result = WC()->cart->add_to_cart( $product_id, $quantity, 0, [], $cart_item_data );
 			}
 
-			if ( $result ) {
-				// Get updated cart fragments for mini cart updates
-				ob_start();
+                        if ( $result ) {
+                                // Get updated cart fragments for mini cart updates
+                                ob_start();
 				WC()->cart->calculate_totals();
 				wc_get_template( 'cart/mini-cart.php' );
 				$mini_cart = ob_get_clean();
@@ -606,7 +606,8 @@ class SlideFirePro_Widgets {
 			return '';
 		}
 
-		$html = '';
+                $html = '';
+                $quick_add_quantity = max( 1, (int) ( $settings['quick_add_quantity'] ?? 3 ) );
 		
 		foreach ( $products as $product_post ) {
 			$product = wc_get_product( $product_post->ID );
@@ -675,11 +676,12 @@ class SlideFirePro_Widgets {
 						$button_text = $is_variable ? $product->add_to_cart_text() : ( $settings['quick_add_text'] ?? 'Quick Add' );
 						?>
 						<button 
-							class="quick-add-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground" 
-							data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
-							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
-							data-product-url="<?php echo esc_url( $product->get_permalink() ); ?>"
-						>
+                                                        class="quick-add-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all h-9 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                                        data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
+                                                        data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+                                                        data-product-url="<?php echo esc_url( $product->get_permalink() ); ?>"
+                                                        data-quantity="<?php echo esc_attr( $quick_add_quantity ); ?>"
+                                                >
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-2" aria-hidden="true">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>
@@ -760,8 +762,10 @@ class SlideFirePro_Widgets {
 	/**
 	 * Build AJAX product cards using same structure as main widget
 	 */
-	private function build_ajax_product_cards( $products, $settings ) {
-		ob_start();
+        private function build_ajax_product_cards( $products, $settings ) {
+                $quick_add_quantity = max( 1, (int) ( $settings['quick_add_quantity'] ?? 3 ) );
+
+                ob_start();
 		
 		while ( $products->have_posts() ) :
 			$products->the_post();
@@ -794,10 +798,11 @@ class SlideFirePro_Widgets {
 						?>
 						<button 
 							class="quick-add-button" 
-							data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
-							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
-							data-product-url="<?php echo esc_url( get_permalink() ); ?>"
-						>
+                                                        data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
+                                                        data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+                                                        data-product-url="<?php echo esc_url( get_permalink() ); ?>"
+                                                        data-quantity="<?php echo esc_attr( $quick_add_quantity ); ?>"
+                                                >
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>
@@ -968,14 +973,17 @@ class SlideFirePro_Widgets {
 	 * Build filtered products HTML for category filtering
 	 */
 	private function build_category_filtered_products( $products ) {
-		$settings = [
-			'show_sale_badge' => 'yes',
-			'show_featured_badge' => 'yes',
-			'show_category_badge' => 'yes',
-			'show_wishlist_button' => 'yes',
-			'show_quick_add_button' => 'yes',
-			'quick_add_text' => 'Quick Add'
-		];
+        $settings = [
+                'show_sale_badge' => 'yes',
+                'show_featured_badge' => 'yes',
+                'show_category_badge' => 'yes',
+                'show_wishlist_button' => 'yes',
+                'show_quick_add_button' => 'yes',
+                'quick_add_text' => 'Quick Add',
+                'quick_add_quantity' => 3,
+        ];
+
+        $quick_add_quantity = max( 1, (int) ( $settings['quick_add_quantity'] ?? 3 ) );
 
 		ob_start();
 		
@@ -1014,12 +1022,13 @@ class SlideFirePro_Widgets {
 						$is_variable = $product && method_exists( $product, 'is_type' ) ? $product->is_type( 'variable' ) : false;
 						$button_text = $is_variable ? $product->add_to_cart_text() : ( $settings['quick_add_text'] ?? 'Quick Add' );
 						?>
-						<button 
-							class="quick-add-button" 
-							data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
-							data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
-							data-product-url="<?php echo esc_url( get_permalink() ); ?>"
-						>
+                                                <button
+                                                        class="quick-add-button"
+                                                        data-product-id="<?php echo esc_attr( get_the_ID() ); ?>"
+                                                        data-product-type="<?php echo esc_attr( $is_variable ? 'variable' : 'simple' ); ?>"
+                                                        data-product-url="<?php echo esc_url( get_permalink() ); ?>"
+                                                        data-quantity="<?php echo esc_attr( $quick_add_quantity ); ?>"
+                                                >
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
 								<circle cx="8" cy="21" r="1"></circle>
 								<circle cx="19" cy="21" r="1"></circle>

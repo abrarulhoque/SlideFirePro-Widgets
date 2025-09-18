@@ -155,11 +155,16 @@
   align-items: center; /* items-center */
   justify-content: center; /* justify-center */
   transition: opacity 300ms ease; /* transition-opacity duration-300 */
+  pointer-events: none;
 }
 
 /* Group hover overlay - group-hover:opacity-100 */
 .slidefirePro-products-wrapper .product-card:hover .product-overlay {
   opacity: 1; /* group-hover:opacity-100 */
+}
+
+.slidefirePro-products-wrapper .product-overlay .quick-add-button {
+  pointer-events: auto;
 }
 
 /* Quick Add Button - Exact Figma button structure */
