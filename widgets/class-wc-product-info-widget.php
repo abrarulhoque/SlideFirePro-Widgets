@@ -290,6 +290,11 @@ class SlideFirePro_WC_Product_Info_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = $this->get_settings_for_display();
         $product = $this->get_current_product();
+        $dynamic_price = null;
+
+        if ( $product && 'yes' === $settings['use_dynamic_price'] ) {
+            $dynamic_price = $this->build_dynamic_price_display( $product );
+        }
         
         ?>
         <div class="slidefire-product-info">
@@ -330,24 +335,19 @@ class SlideFirePro_WC_Product_Info_Widget extends \Elementor\Widget_Base {
 
             <!-- Price Section -->
             <div class="slidefire-price-wrapper">
-                <?php if ( $product && 'yes' === $settings['use_dynamic_price'] ) : ?>
-                    <?php if ( $product->is_on_sale() ) : ?>
-                        <span class="slidefire-current-price"><?php echo wc_price( $product->get_sale_price() ); ?></span>
-                        <span class="slidefire-original-price"><?php echo wc_price( $product->get_regular_price() ); ?></span>
-                        <?php 
-                        $regular_price = (float) $product->get_regular_price();
-                        $sale_price = (float) $product->get_sale_price();
-                        if ( $regular_price > 0 && $sale_price > 0 ) {
-                            $discount = round( ( ( $regular_price - $sale_price ) / $regular_price ) * 100 );
-                            ?>
-                            <span class="slidefire-discount-badge">
-                                <?php echo esc_html( $discount . '% OFF' ); ?>
-                            </span>
-                            <?php
-                        }
-                        ?>
-                    <?php else : ?>
-                        <span class="slidefire-current-price"><?php echo wc_price( $product->get_price() ); ?></span>
+                <?php if ( $dynamic_price ) : ?>
+                    <?php if ( ! empty( $dynamic_price['current_price'] ) ) : ?>
+                        <span class="slidefire-current-price"><?php echo wp_kses_post( $dynamic_price['current_price'] ); ?></span>
+                    <?php endif; ?>
+
+                    <?php if ( ! empty( $dynamic_price['original_price'] ) ) : ?>
+                        <span class="slidefire-original-price"><?php echo wp_kses_post( $dynamic_price['original_price'] ); ?></span>
+                    <?php endif; ?>
+
+                    <?php if ( ! empty( $dynamic_price['discount'] ) ) : ?>
+                        <span class="slidefire-discount-badge">
+                            <?php echo esc_html( $dynamic_price['discount'] . '% OFF' ); ?>
+                        </span>
                     <?php endif; ?>
                 <?php else : ?>
                     <span class="slidefire-current-price">$<?php echo esc_html( $settings['current_price'] ); ?></span>
@@ -380,6 +380,80 @@ class SlideFirePro_WC_Product_Info_Widget extends \Elementor\Widget_Base {
             </p>
         </div>
         <?php
+    }
+
+    /**
+     * Prepare formatted pricing details for the current product.
+     */
+    private function build_dynamic_price_display( WC_Product $product ) {
+        $price_data = [
+            'current_price'  => '',
+            'original_price' => '',
+            'discount'       => '',
+        ];
+
+        if ( $product->is_type( 'variable' ) ) {
+            $min_price         = (float) $product->get_variation_price( 'min', true );
+            $max_price         = (float) $product->get_variation_price( 'max', true );
+            $min_regular_price = (float) $product->get_variation_regular_price( 'min', true );
+            $max_regular_price = (float) $product->get_variation_regular_price( 'max', true );
+            $has_price_range   = $min_price !== $max_price && 0 !== $max_price;
+
+            if ( $has_price_range ) {
+                // Match WooCommerce behaviour: show range and avoid messy strike-through markup for variable pricing.
+                $price_data['current_price'] = wc_format_price_range( $min_price, $max_price );
+
+                if ( $product->is_on_sale() && ( $min_regular_price > $min_price ) ) {
+                    $price_data['original_price'] = ( $min_regular_price === $max_regular_price )
+                        ? wc_price( $min_regular_price )
+                        : wc_format_price_range( $min_regular_price, $max_regular_price );
+
+                    if ( $min_regular_price > 0 ) {
+                        $discount = round( ( ( $min_regular_price - $min_price ) / $min_regular_price ) * 100 );
+                        if ( $discount > 0 ) {
+                            $price_data['discount'] = $discount;
+                        }
+                    }
+                }
+            } else {
+                $display_price = $min_price > 0 ? $min_price : (float) wc_get_price_to_display( $product );
+                $regular_price = $min_regular_price > 0 ? $min_regular_price : (float) $product->get_regular_price();
+
+                $price_data['current_price'] = wc_price( $display_price );
+
+                if ( $product->is_on_sale() && $regular_price > $display_price ) {
+                    $price_data['original_price'] = wc_price( $regular_price );
+
+                    $discount = round( ( ( $regular_price - $display_price ) / $regular_price ) * 100 );
+                    if ( $discount > 0 ) {
+                        $price_data['discount'] = $discount;
+                    }
+                }
+            }
+        } else {
+            $display_price = (float) wc_get_price_to_display( $product );
+            $regular_price = (float) $product->get_regular_price();
+
+            $price_data['current_price'] = wc_price( $display_price );
+
+            if ( $product->is_on_sale() && $regular_price > $display_price ) {
+                $price_data['original_price'] = wc_price( $regular_price );
+
+                $discount = round( ( ( $regular_price - $display_price ) / $regular_price ) * 100 );
+                if ( $discount > 0 ) {
+                    $price_data['discount'] = $discount;
+                }
+            }
+        }
+
+        if ( '' === $price_data['current_price'] ) {
+            $fallback_price = wc_get_price_to_display( $product );
+            if ( is_numeric( $fallback_price ) ) {
+                $price_data['current_price'] = wc_price( (float) $fallback_price );
+            }
+        }
+
+        return $price_data;
     }
 
     /**
